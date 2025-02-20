@@ -12,12 +12,23 @@ const userSchema = new Schema<IUser>(
     },
     password: {
       type: String,
-      required: true,
+      select: false,
+      // required: true,
     },
     role: {
       type: String,
       enum: ["user", "admin"],
       default: "user",
+    },
+    authProviderId: {
+      type: String,
+      unique: true,
+      sparse: true, // Allows null values for non-google users
+    },
+    authProviderName: {
+      type: String,
+      enum: ["google", "github", "credentials"],
+      default: "credentials",
     },
   },
   { timestamps: true }

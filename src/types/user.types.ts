@@ -5,6 +5,8 @@ export interface IUser {
   email: string;
   password: string;
   role: "user" | "admin";
+  authProviderId: string;
+  authProviderName: "google" | "github" | "credentials";
   _id?: mongoose.Types.ObjectId;
   createdAt?: Date;
   updatedAt?: Date;

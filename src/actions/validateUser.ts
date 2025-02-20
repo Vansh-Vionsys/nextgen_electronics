@@ -11,10 +11,12 @@ export const validateUser = async (
     if (!Credentials?.email || !Credentials?.password)
       throw new Error("Credentials required");
     await dbConnect();
-
-    const user = await User.findOne({ email: Credentials?.email });
-    if (!user) throw new Error("user not found");
-
+    console.log("Credentials", Credentials);
+    const user = await User.findOne({ email: Credentials?.email }).select(
+      "+password"
+    );
+    if (!user) throw new Error("User not found");
+    console.log("user", user);
     const isValid = await bcrypt.compare(Credentials?.password, user?.password);
     if (!isValid) throw new Error("Invalid password");
 
