@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import { signIn, useSession } from "next-auth/react";
 import useRegister from "@/features/authMutations/useRegister";
 import { useRouter } from "next/navigation";
 import { IRegisterUser } from "@/types/user.types";
@@ -8,9 +7,6 @@ import AuthButton from "@/components/AuthButton";
 import Link from "next/link";
 
 const SignUp = () => {
-  const { data: session, status } = useSession();
-  console.log(session, status);
-
   const [showPassword, setShowPassword] = useState(false);
   const { register, registerLoading } = useRegister();
   const router = useRouter();

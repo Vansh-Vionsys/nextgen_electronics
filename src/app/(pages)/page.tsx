@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 
 const Page = () => {
@@ -31,12 +32,12 @@ const Page = () => {
       </h2>
 
       {/* Call-to-Action Button */}
-      <a
+      <Link
         className="bg-orange-600 dark:bg-gray-800 rounded-lg text-white dark:text-gray-300 font-medium px-5 py-3 mt-6 sm:mt-10 text-sm sm:text-base hover:bg-orange-500 dark:hover:bg-gray-600 transition"
-        href="#"
+        href="/products"
       >
         Browse Products
-      </a>
+      </Link>
     </div>
   );
 };

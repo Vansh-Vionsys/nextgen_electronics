@@ -1,15 +1,12 @@
 "use client";
 import AuthButton from "@/components/AuthButton";
-import { signIn, useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 
 const SignIn = () => {
-  const { data: session, status } = useSession();
-  console.log(session, status);
-
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 

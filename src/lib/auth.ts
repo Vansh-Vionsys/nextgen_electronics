@@ -1,4 +1,4 @@
-import { AuthOptions, Session } from "next-auth";
+import { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import dbConnect from "./dbConnect";
@@ -72,7 +72,7 @@ export const authOptions: AuthOptions = {
         token.name = user.name;
         token.role = (user as UserTypes).role;
         token.authProviderId = (user as UserTypes).authProviderId;
-        token.authProviderName = (user as UserTypes).authProviderName; // ✅ Include authProviderName
+        token.authProviderName = (user as UserTypes).authProviderName;
       }
       return token;
     },
@@ -84,7 +84,7 @@ export const authOptions: AuthOptions = {
         session.user.name = token.name as string;
         session.user.role = token.role as string;
         session.user.authProviderId = token.authProviderId as string;
-        session.user.authProviderName = token.authProviderName as string; // ✅ Include authProviderName
+        session.user.authProviderName = token.authProviderName as string;
       }
       return session;
     },
@@ -102,7 +102,8 @@ export const authOptions: AuthOptions = {
 
           user.id = existingUser?._id;
           (user as UserTypes).authProviderId = existingUser?.authProviderId;
-          (user as UserTypes).authProviderName = existingUser?.authProviderName; // ✅ Include authProviderName
+          (user as UserTypes).authProviderName = existingUser?.authProviderName;
+          (user as UserTypes).role = existingUser?.role;
           return true;
         } catch (error) {
           console.error("Google sign-in error:", error);
@@ -118,18 +119,14 @@ export const authOptions: AuthOptions = {
   },
 
   pages: {
-    signIn: "/login",
+    signIn: "/sign-in",
+    error: "/sign-in",
   },
-
   session: {
     strategy: "jwt",
-    maxAge: 15 * 24 * 60 * 60, // 15 days
-    updateAge: 24 * 60 * 60, // 1 day
+    maxAge: 30 * 24 * 60 * 60,
   },
 
-  theme: {
-    colorScheme: "auto",
-  },
   secret: process.env.AUTH_SECRET!,
 };
 

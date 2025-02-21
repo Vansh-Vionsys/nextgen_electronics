@@ -3,24 +3,37 @@ import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
+import { GiShoppingCart } from "react-icons/gi";
 
 const Navbar = () => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  console.log("session:", session, "status:", status);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const isLogin = session?.user;
+  const isAdmin = session?.user?.role === "admin"; // Assuming role exists in session
 
   const navLinks = [
-    { name: "Home", href: "/" },
     { name: "About", href: "/about" },
+    { name: "My Orders", href: "/my-orders" },
     { name: "Products", href: "/products" },
     { name: "Contact", href: "/contact" },
   ];
 
+  const adminNavLinks = [
+    { name: "Dashboard", href: "/admin/dashboard" },
+    { name: "Products", href: "/admin/products" },
+    { name: "Manage Products", href: "/admin/manage-products" },
+    { name: "All Orders", href: "/admin/all-orders" },
+  ];
+
+  const linksToDisplay = isAdmin ? adminNavLinks : navLinks;
+
   return (
     <nav className="bg-white border-b border-gray-200 dark:bg-gray-900">
       <div className="max-w-screen-xl flex items-center justify-between mx-auto p-4">
-        {/* Left Side - Logo */}
+        {/* Logo */}
         <Link
           href="/"
           className="text-xl font-semibold text-gray-900 dark:text-white"
@@ -30,7 +43,7 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center space-x-6">
-          {navLinks.map((link, index) => (
+          {linksToDisplay.map((link, index) => (
             <Link
               key={index}
               href={link.href}
@@ -43,6 +56,17 @@ const Navbar = () => {
 
         {/* Right Side - Profile & Get Started */}
         <div className="flex items-center gap-4">
+          {/* cart icon */}
+          {!isAdmin && (
+            <div>
+              <Link href="/cart">
+                <div className="flex items-center text-gray-700 dark:text-gray-300 hover:text-purple-700 dark:hover:text-white">
+                  <GiShoppingCart className="w-6 h-6" />
+                </div>
+              </Link>
+            </div>
+          )}
+
           {/* Profile Avatar - Only if logged in */}
           {isLogin && (
             <div className="relative">
@@ -147,7 +171,7 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className="lg:hidden bg-gray-100 dark:bg-gray-800">
           <ul className="flex flex-col items-center py-4 space-y-4">
-            {navLinks.map((link, index) => (
+            {linksToDisplay.map((link, index) => (
               <li key={index}>
                 <Link
                   href={link.href}
