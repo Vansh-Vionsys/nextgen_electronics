@@ -1,7 +1,11 @@
+"use client";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import React from "react";
 
 const Page = () => {
+  const { data: session } = useSession();
+
   return (
     <div className="flex flex-col items-center justify-center w-full text-center px-6 py-16 sm:py-20 bg-gradient-to-r from-green-50/50 via-teal-50 to-green-50/50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 h-screen">
       {/* Small Tagline */}
@@ -32,12 +36,21 @@ const Page = () => {
       </h2>
 
       {/* Call-to-Action Button */}
-      <Link
-        className="bg-orange-600 dark:bg-gray-800 rounded-lg text-white dark:text-gray-300 font-medium px-5 py-3 mt-6 sm:mt-10 text-sm sm:text-base hover:bg-orange-500 dark:hover:bg-gray-600 transition"
-        href="/products"
-      >
-        Browse Products
-      </Link>
+      {session?.user.role === "admin" ? (
+        <Link
+          className="bg-orange-600 dark:bg-gray-800 rounded-lg text-white dark:text-gray-300 font-medium px-5 py-3 mt-6 sm:mt-10 text-sm sm:text-base hover:bg-orange-500 dark:hover:bg-gray-600 transition"
+          href="/admin/products"
+        >
+          Browse Products
+        </Link>
+      ) : (
+        <Link
+          className="bg-orange-600 dark:bg-gray-800 rounded-lg text-white dark:text-gray-300 font-medium px-5 py-3 mt-6 sm:mt-10 text-sm sm:text-base hover:bg-orange-500 dark:hover:bg-gray-600 transition"
+          href="/products"
+        >
+          Browse Products
+        </Link>
+      )}
     </div>
   );
 };

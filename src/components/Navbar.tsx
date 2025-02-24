@@ -29,6 +29,7 @@ const Navbar = () => {
   ];
 
   const linksToDisplay = isAdmin ? adminNavLinks : navLinks;
+  // if (!session?.user.role) return <div>loading......</div>;
 
   return (
     <nav className="bg-white border-b border-gray-200 dark:bg-gray-900">
