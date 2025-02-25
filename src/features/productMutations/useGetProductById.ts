@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 const useGetProductById = (id: string) => {
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["product", id],
+    queryKey: ["products", id],
     queryFn: () => getProductByIdAPI(id),
   });
 

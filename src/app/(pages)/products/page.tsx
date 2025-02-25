@@ -2,6 +2,7 @@
 import React from "react";
 import useGetAllProducts from "@/features/productMutations/useGetAllProducts";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const Products = () => {
   const { getAllProducts, getAllProductsError, getAllProductsLoading } =
@@ -11,7 +12,7 @@ const Products = () => {
     return <p className="text-center text-lg">Loading...</p>;
   if (getAllProductsError)
     return <p className="text-center text-red-500">Error fetching products</p>;
-
+  console.log(getAllProducts);
   return (
     <div className="p-6">
       <h1 className="text-3xl font-bold text-center mb-6">Our Products</h1>
@@ -51,9 +52,7 @@ const Products = () => {
                   ⭐ {product.ratings}
                 </span>
               </div>
-              <button className="w-full bg-indigo-800 text-white font-bold py-2 px-4 rounded-md hover:bg-indigo-500 transition">
-                Add to Cart
-              </button>
+              <Button>Add to Cart</Button>
             </div>
           </div>
         ))}
