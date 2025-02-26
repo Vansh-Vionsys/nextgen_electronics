@@ -1,6 +1,8 @@
 "use client";
 import { signIn } from "next-auth/react";
 import React from "react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const AuthButton = () => {
   const handleSubmit = () => {
@@ -9,12 +11,16 @@ const AuthButton = () => {
 
   return (
     <section>
-      <button
-        className="w-full rounded-lg py-2 bg-indigo-100 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline"
+      <Button
+        variant="outline"
+        className={cn(
+          "w-full flex items-center justify-center gap-3 py-2 transition-all duration-300 ease-in-out",
+          "bg-white text-gray-800 hover:shadow focus:shadow-sm focus:shadow-outline"
+        )}
         onClick={handleSubmit}
       >
-        <div className="bg-white p-2 rounded-full">
-          <svg className="w-4" viewBox="0 0 533.5 544.3">
+        <div className="bg-white p-1.5 rounded-full">
+          <svg className="w-3 h-3" viewBox="0 0 533.5 544.3">
             <path
               d="M533.5 278.4c0-18.5-1.5-37.1-4.7-55.3H272.1v104.8h147c-6.1 33.8-25.7 63.7-54.4 82.7v68h87.7c51.5-47.4 81.1-117.4 81.1-200.2z"
               fill="#4285f4"
@@ -33,8 +39,8 @@ const AuthButton = () => {
             />
           </svg>
         </div>
-        <span className="ml-4">Sign Up with Google</span>
-      </button>
+        <span>Continue with Google</span>
+      </Button>
     </section>
   );
 };

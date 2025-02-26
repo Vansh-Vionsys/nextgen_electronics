@@ -5,19 +5,47 @@ import { useRouter } from "next/navigation";
 import { IRegisterUser } from "@/types/user.types";
 import AuthButton from "@/components/AuthButton";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+
+// Define the form schema using Zod
+const formSchema = z.object({
+  userName: z.string().min(2, "Username must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(2, "Password must be at least 2 characters"),
+});
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { register, registerLoading } = useRegister();
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+  // Initialize the form with react-hook-form and zod
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      userName: "",
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
     const data: IRegisterUser = {
-      userName: formData.get("userName")?.toString() || "",
-      email: formData.get("email")?.toString() || "",
-      password: formData.get("password")?.toString() || "",
+      userName: values.userName,
+      email: values.email,
+      password: values.password,
     };
     console.log(data);
     register(data, {
@@ -32,73 +60,70 @@ const SignUp = () => {
           <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
             Create an account
           </h1>
-          <form
-            className="space-y-4 md:space-y-4"
-            method="POST"
-            onSubmit={handleSubmit}
-          >
-            <div>
-              <label
-                htmlFor="userName"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                User Name
-              </label>
-              <input
-                type="text"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
                 name="userName"
-                id="userName"
-                className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="John Deo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>User Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="John Deo" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div>
-              <label
-                htmlFor="email"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Email Address
-              </label>
-              <input
-                type="email"
+              <FormField
+                control={form.control}
                 name="email"
-                id="email"
-                className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="JohnDeo@mail.com"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="JohnDeo@mail.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div>
-              <label
-                htmlFor="password"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          {...field}
+                          className="pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-3 flex items-center text-gray-500 dark:text-gray-300"
+                        >
+                          {showPassword ? "👁️" : "🙈"}
+                        </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                disabled={registerLoading}
+                className="w-full"
               >
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  id="password"
-                  placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-3 flex items-center text-gray-500 dark:text-gray-300"
-                >
-                  {showPassword ? "👁️" : "🙈"}
-                </button>
-              </div>
-            </div>
-            <button
-              disabled={registerLoading}
-              type="submit"
-              className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              {registerLoading ? "loading..." : "Sign Up"}
-            </button>
-          </form>
+                {registerLoading ? "loading..." : "Sign Up"}
+              </Button>
+            </form>
+          </Form>
           <div className="flex items-center justify-between">
             <span className="border-b w-1/2"></span>
             <a href="#" className="text-xs text-center text-gray-500 uppercase">

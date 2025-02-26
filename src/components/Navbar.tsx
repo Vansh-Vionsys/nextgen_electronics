@@ -39,7 +39,7 @@ const Navbar = () => {
         {/* Logo */}
         <Link
           href="/"
-          className="md:text-xl sm:text-sm font-semibold text-gray-900 dark:text-white"
+          className="md:text-xl sm:text-sm font-semibold text-indigo-400"
         >
           NextGenElectronics
         </Link>
@@ -134,8 +134,8 @@ const Navbar = () => {
           {!isLogin && (
             <div className="hidden lg:block">
               <Link
-                href="/sign-up"
-                className="bg-purple-700 text-white px-4 py-2 rounded-lg hover:bg-purple-800 dark:bg-purple-600 dark:hover:bg-purple-700"
+                href="/sign-in"
+                className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 "
               >
                 Get Started
               </Link>
@@ -182,7 +182,7 @@ const Navbar = () => {
               <li key={index}>
                 <Link
                   href={link.href}
-                  className="text-gray-700 hover:text-purple-700 dark:text-gray-300 dark:hover:text-white"
+                  className="text-gray-700 hover:text-indigo-700 dark:text-gray-300 dark:hover:text-white"
                 >
                   {link.name}
                 </Link>
@@ -191,8 +191,8 @@ const Navbar = () => {
             {!isLogin && (
               <li>
                 <Link
-                  href="/sign-up"
-                  className="bg-purple-700 text-white px-4 py-2 rounded-lg hover:bg-purple-800 dark:bg-purple-600 dark:hover:bg-purple-700"
+                  href="/sign-in"
+                  className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
                 >
                   Get Started
                 </Link>

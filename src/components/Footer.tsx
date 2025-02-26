@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <div className="bg-gray-900 text-gray-300 border-t border-gray-200">
+    <div className="dark:bg-gray-900 dark:text-gray-300 text-black border-t border-gray-200 bg-white">
       <div className="max-w-screen-lg py-10 px-4 sm:px-6 sm:flex justify-between mx-auto">
         <div className="p-5 sm:w-2/12 border-r border-gray-700">
           <div className="text-sm uppercase text-indigo-400 font-bold">
@@ -41,7 +41,7 @@ const Footer = () => {
           <h3 className="font-bold text-xl text-indigo-400 mb-4">
             Componentity
           </h3>
-          <p className="text-gray-400 text-sm mb-10">
+          <p className="text-gray-600 dar:text-gray-400 text-sm mb-10">
             Lorem Ipsum is simply dummy text of the printing and typesetting
             industry. Lorem Ipsum has been the industry's standard dummy text
             ever since the 1500s.
