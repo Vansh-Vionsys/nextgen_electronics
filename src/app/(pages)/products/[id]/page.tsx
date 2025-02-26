@@ -1,7 +1,13 @@
 "use client";
+import React, { useState, useEffect } from "react";
 import useGetProductById from "@/features/productMutations/useGetProductById";
 import { useParams } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Label } from "@/components/ui/label";
 
 const Page = () => {
   const { id } = useParams();
@@ -19,18 +25,43 @@ const Page = () => {
 
   if (getProductDetailsLoading) {
     return (
-      <p className="text-center text-gray-500">Loading product details...</p>
+      <div className="container mx-auto py-8 px-4">
+        <div className="flex flex-wrap items-start -mx-4">
+          <div className="w-full md:w-1/2 px-4 mb-8">
+            <Skeleton className="w-full max-w-[350px] h-64 mx-auto rounded-lg" />
+            <div className="flex gap-4 py-4 justify-center">
+              {[...Array(4)].map((_, index) => (
+                <Skeleton key={index} className="size-20 rounded-md" />
+              ))}
+            </div>
+          </div>
+          <div className="w-full md:w-1/2 px-4">
+            <Skeleton className="h-8 w-3/4 mb-2" />
+            <Skeleton className="h-6 w-1/2 mb-4" />
+            <Skeleton className="h-6 w-1/3 mb-4" />
+            <Skeleton className="h-20 w-full mb-6" />
+            <div className="flex space-x-4">
+              <Skeleton className="h-10 w-32" />
+              <Skeleton className="h-10 w-32" />
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
   if (getProductDetailError) {
     return (
-      <p className="text-center text-red-500">Error fetching product details</p>
+      <p className="text-center text-red-500 text-lg">
+        Error fetching product details
+      </p>
     );
   }
 
   if (!getProductDetail) {
-    return <p className="text-center text-gray-500">No product found</p>;
+    return (
+      <p className="text-center text-gray-500 text-lg">No product found</p>
+    );
   }
 
   return (
@@ -38,11 +69,15 @@ const Page = () => {
       <div className="flex flex-wrap items-start -mx-4">
         {/* Image Section */}
         <div className="w-full md:w-1/2 px-4 mb-8">
-          <img
-            src={mainImage as string}
-            alt="Product"
-            className="w-full bg-slate-800 max-w-[350px] mx-auto rounded-lg shadow-md mb-4"
-          />
+          <Card className="bg-slate-800 max-w-[350px] mx-auto">
+            <CardContent className="p-0">
+              <img
+                src={mainImage as string}
+                alt={getProductDetail.name}
+                className="w-full h-64 object-cover rounded-t-lg"
+              />
+            </CardContent>
+          </Card>
           <div className="flex gap-4 py-4 justify-center overflow-x-auto">
             {getProductDetail.images.map((image: any, index: number) => (
               <img
@@ -72,8 +107,8 @@ const Page = () => {
 
           {/* Price */}
           <div className="mb-4">
-            <span className="text-2xl text-green-500 font-bold mr-2">
-              ${getProductDetail.price}
+            <span className="text-2xl text-green-500 font-bold">
+              ₹{getProductDetail.price}
             </span>
           </div>
 
@@ -82,17 +117,18 @@ const Page = () => {
             <span className="font-bold text-gray-600 dark:text-gray-200">
               Availability:{" "}
             </span>
-            <span
-              className={`font-bold ${
-                getProductDetail?.stock > 0
-                  ? "text-red-500"
-                  : "text-gray-300 underline"
-              }`}
+            <Badge
+              variant={getProductDetail.stock > 0 ? "default" : "destructive"}
+              className={
+                getProductDetail.stock > 0
+                  ? "bg-green-500"
+                  : "bg-red-500 underline"
+              }
             >
-              {getProductDetail?.stock > 0
-                ? `${getProductDetail?.stock} items left`
+              {getProductDetail.stock > 0
+                ? `${getProductDetail.stock} items left`
                 : "Out of Stock"}
-            </span>
+            </Badge>
           </div>
 
           {/* Description */}
@@ -102,26 +138,29 @@ const Page = () => {
 
           {/* Quantity Selector */}
           <div className="mb-6 flex items-center space-x-3">
-            <label htmlFor="quantity" className="font-bold text-gray-200">
+            <Label htmlFor="quantity" className="font-bold">
               Quantity:
-            </label>
-            <input
+            </Label>
+            <Input
               type="number"
               id="quantity"
               min="1"
               defaultValue="1"
-              className="w-14 border text-center rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-300 dark:focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:ring-opacity-50 dark:bg-gray-800 dark:text-gray-200"
+              className="w-16 text-center"
             />
           </div>
 
           {/* Buttons */}
           <div className="flex space-x-4 mb-6">
-            <button className="bg-indigo-600 dark:bg-indigo-500 text-white px-6 py-2 rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-400">
+            <Button className="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400">
               Add to Cart
-            </button>
-            <button className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-300 px-6 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600">
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full dark:border-gray-600 dark:hover:bg-gray-700"
+            >
               Wishlist
-            </button>
+            </Button>
           </div>
         </div>
       </div>
