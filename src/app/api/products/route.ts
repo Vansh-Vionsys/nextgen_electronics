@@ -2,11 +2,10 @@ import uploadCloudinary from "@/helpers/uploadCloudinary";
 import { authOptions } from "@/lib/auth";
 import dbConnect from "@/lib/dbConnect";
 import Product from "@/models/product.model";
-import { IProduct } from "@/types/product.types";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-// Product add API with Cloudinary image uploads
+// add product API with cloudinary image uploads (POST)
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -19,7 +18,7 @@ export async function POST(req: NextRequest) {
 
     await dbConnect();
 
-    // Parse form-data
+    // parse form-data
     const formData = await req.formData();
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
@@ -42,7 +41,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get images from formData
+    // get images from formData
     const imagesFiles = formData.getAll("images") as File[];
     if (!imagesFiles.length) {
       return NextResponse.json(
@@ -51,7 +50,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Convert files to Buffers
+    // convert files to Buffers
     const imageBuffers = await Promise.all(
       imagesFiles.map(async (file, index) => {
         console.log(
@@ -62,11 +61,11 @@ export async function POST(req: NextRequest) {
       })
     );
 
-    // Upload images to Cloudinary
+    // upload images to Cloudinary
     const uploadedImages = await uploadCloudinary(imageBuffers, "products");
     console.log("Uploaded images:", uploadedImages);
 
-    // Create new product with uploaded images
+    // create new product with uploaded images
     const newProduct = await Product.create({
       name,
       description,
@@ -93,7 +92,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET all products
+// get all products (GET)
 export async function GET() {
   try {
     await dbConnect();

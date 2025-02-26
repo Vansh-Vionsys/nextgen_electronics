@@ -6,7 +6,7 @@ import Product from "@/models/product.model";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-// GET single product by id
+// get single product by id (GET)
 export async function GET(
   req: NextRequest,
   context: { params: { id: string } }
@@ -27,7 +27,7 @@ export async function GET(
   }
 }
 
-// PUT update product
+// update product by id (PUT)
 export async function PUT(
   req: NextRequest,
   context: { params: { id: string } }
@@ -46,7 +46,7 @@ export async function PUT(
     const { id } = context.params;
     const formData = await req.formData();
 
-    // Extracting form fields
+    // extracting form fields
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const price = formData.get("price")
@@ -60,18 +60,18 @@ export async function PUT(
       ? parseFloat(formData.get("ratings") as string)
       : undefined;
 
-    // Get images from formData
+    // get images from formData
     const imagesFiles = formData.getAll("images") as File[];
     let uploadedImages = [] as any;
 
-    // Find the existing product
+    // find the existing product
     const existingProduct = await Product.findById(id);
     if (!existingProduct) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
     if (imagesFiles.length) {
-      // Delete old images from Cloudinary
+      // delete old images from cloudinary
       if (existingProduct.images?.length) {
         const oldImagePublicIds = existingProduct.images.map(
           (img: any) => img.public_id
@@ -79,7 +79,7 @@ export async function PUT(
         await deleteCloudinary(oldImagePublicIds); // Now passing an array correctly
       }
 
-      // Convert files to Buffers and upload new images
+      // convert files to buffers and upload new images
       const imageBuffers = await Promise.all(
         imagesFiles.map(async (file, index) => {
           console.log(
@@ -94,7 +94,7 @@ export async function PUT(
       console.log("Uploaded images:", uploadedImages);
     }
 
-    // Find the product and update fields
+    // find the product and update fields
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
       {
@@ -126,7 +126,7 @@ export async function PUT(
   }
 }
 
-// DELETE: remove a product (Admin only)
+// remove a product by id (DELETE)
 export async function DELETE(
   req: NextRequest,
   context: { params: { id: string } }
@@ -141,24 +141,24 @@ export async function DELETE(
       );
     }
 
-    // Connect to DB
+    // connect to DB
     await dbConnect();
     const { id } = context.params;
 
-    // Find product
+    // find product
     const product = await Product.findById(id);
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    // Delete all images from Cloudinary
+    // delete all images associated with this product Cloudinary
     if (product.images?.length > 0) {
       const oldImagePublicIds = product.images.map((img: any) => img.public_id);
       await deleteCloudinary(oldImagePublicIds); // Pass array of `public_id`s
       console.log("All images deleted successfully from Cloudinary.");
     }
 
-    // Delete product from DB
+    // delete product from DB
     await Product.findByIdAndDelete(id);
 
     return NextResponse.json(

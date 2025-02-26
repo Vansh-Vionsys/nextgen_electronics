@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { X, Upload } from "lucide-react";
 import useGetAllProducts from "@/features/productMutations/useGetAllProducts";
 import useDeleteProductById from "@/features/productMutations/useDeleteProductById";
 import useUpdateProduct from "@/features/productMutations/useUpdateProduct";
@@ -21,6 +22,7 @@ import {
   SelectContent,
   SelectItem,
 } from "../ui/select";
+import { ScrollArea } from "../ui/scroll-area";
 
 const categories = [
   "Mobile & Accessories",
@@ -28,7 +30,18 @@ const categories = [
   "Cameras & Accessories",
   "Computers & Laptops",
   "Home Appliances",
-];
+] as const;
+
+interface Product {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  category: string;
+  ratings: number;
+  images: { url: string; public_id: string }[];
+}
 
 const ProductCard = () => {
   const { getAllProducts, getAllProductsError, getAllProductsLoading } =
@@ -40,9 +53,19 @@ const ProductCard = () => {
     null
   );
   const [open, setOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [formData, setFormData] = useState<Partial<Product>>({});
   const [newImages, setNewImages] = useState<File[]>([]);
-  const [imagePreview, setImagePreview] = useState<string[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!open) {
+      setFormData({});
+      setNewImages([]);
+      setImagePreviews([]);
+      setSelectedProduct(null);
+    }
+  }, [open]);
 
   if (getAllProductsLoading)
     return <p className="text-center text-lg">Loading...</p>;
@@ -56,53 +79,73 @@ const ProductCard = () => {
     }
   };
 
-  const handleUpdateClick = (product: any) => {
+  const handleUpdateClick = (product: Product) => {
     setSelectedProduct(product);
-    setImagePreview(product.images?.map((img: any) => img.url) || []);
+    setFormData(product);
+    setImagePreviews(product.images?.map((img) => img.url) || []);
     setOpen(true);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+    const files = Array.from(e.target.files || []).filter(
+      (file) => file.size <= 10 * 1024 * 1024
+    );
     if (files.length) {
-      setNewImages(files);
-      setImagePreview([
-        ...imagePreview,
-        ...files.map((file) => URL.createObjectURL(file)),
-      ]);
+      const newPreviews = files.map((file) => URL.createObjectURL(file));
+      setNewImages((prev) => [...prev, ...files]);
+      setImagePreviews((prev) => [...prev, ...newPreviews]);
     }
   };
 
   const removeImage = (index: number) => {
-    setImagePreview(imagePreview.filter((_, i) => i !== index));
-    setNewImages(newImages.filter((_, i) => i !== index));
+    const isExistingImage = index < (selectedProduct?.images.length || 0);
+    if (isExistingImage) {
+      setFormData((prev) => ({
+        ...prev,
+        images: prev.images?.filter((_, i) => i !== index),
+      }));
+    } else {
+      const newImageIndex = index - (selectedProduct?.images.length || 0);
+      setNewImages((prev) => prev.filter((_, i) => i !== newImageIndex));
+    }
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleUpdateProduct = async (e: React.FormEvent) => {
+  const handleUpdateProduct = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedProduct) return;
 
-    const formData = new FormData();
-    formData.append("name", selectedProduct.name);
-    formData.append("description", selectedProduct.description);
-    formData.append("price", selectedProduct.price);
-    formData.append("stock", selectedProduct.stock);
-    formData.append("category", selectedProduct.category);
-    formData.append("ratings", selectedProduct.ratings);
+    const updatedFormData = new FormData();
+    updatedFormData.append("name", formData.name || "");
+    updatedFormData.append("description", formData.description || "");
+    updatedFormData.append("price", String(formData.price || 0));
+    updatedFormData.append("stock", String(formData.stock || 0));
+    updatedFormData.append("category", formData.category || "");
+    updatedFormData.append("ratings", String(formData.ratings || 0));
 
-    newImages.forEach((file) => formData.append("images", file));
+    newImages.forEach((file) => updatedFormData.append("images", file));
+    const existingImageIds = formData.images?.map((img) => img.public_id) || [];
+    updatedFormData.append(
+      "existingImageIds",
+      JSON.stringify(existingImageIds)
+    );
 
-    updateProduct({ id: selectedProduct._id, data: formData });
-
-    setNewImages([]);
-    setImagePreview([]);
+    updateProduct(
+      { id: selectedProduct._id, data: updatedFormData },
+      {
+        onSuccess: () => {
+          setOpen(false);
+        },
+      }
+    );
   };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-      {getAllProducts?.map((product: any) => (
+      {getAllProducts?.map((product: Product) => (
         <div
           key={product._id}
-          className="rounded-xl shadow-lg bg-white overflow-hidden"
+          className="rounded-xl shadow-lg dark:bg-slate-900 bg-white overflow-hidden"
         >
           <img
             src={product.images?.[0]?.url || "/placeholder.jpg"}
@@ -110,146 +153,248 @@ const ProductCard = () => {
             className="w-full h-48 object-cover"
           />
           <div className="p-4">
-            <h3 className="text-xl font-semibold">{product.name}</h3>
-            <p className="text-gray-600">{product.description}</p>
+            <h3 className="text-xl font-semibold dark:text-white text-gray-900">
+              {product.name}
+            </h3>
+            <p className="text-gray-400">{product.description}</p>
             <div className="mt-2 flex justify-between items-center">
-              <span className="text-lg font-bold">₹{product.price}</span>
+              <span className="text-lg font-bold dark:text-white text-gray-900">
+                ₹{product.price}
+              </span>
               <span className="text-sm text-yellow-500">
                 ⭐ {product.ratings} ({product.stock} left)
               </span>
             </div>
-            <div className="flex justify-between mt-4">
+            <div className="flex justify-between mt-4 gap-2">
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full mr-2"
+                    className="w-full dark:border-gray-600 dark:text-white"
                     onClick={() => handleUpdateClick(product)}
                   >
                     Update
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-w-[90vw] sm:max-w-[600px] md:max-w-[700px] lg:max-w-[800px] bg-white dark:bg-gray-900 rounded-lg">
                   <DialogHeader>
-                    <DialogTitle>Update Product</DialogTitle>
+                    <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+                      Update Product
+                    </DialogTitle>
                   </DialogHeader>
-                  <form onSubmit={handleUpdateProduct} className="space-y-4">
-                    <Label htmlFor="name">Product Name</Label>
-                    <Input
-                      id="name"
-                      value={selectedProduct?.name || ""}
-                      onChange={(e) =>
-                        setSelectedProduct({
-                          ...selectedProduct,
-                          name: e.target.value,
-                        })
-                      }
-                      required
-                    />
-
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      value={selectedProduct?.description || ""}
-                      onChange={(e) =>
-                        setSelectedProduct({
-                          ...selectedProduct,
-                          description: e.target.value,
-                        })
-                      }
-                      required
-                    />
-
-                    <Label htmlFor="price">Price</Label>
-                    <Input
-                      type="number"
-                      id="price"
-                      value={selectedProduct?.price || ""}
-                      onChange={(e) =>
-                        setSelectedProduct({
-                          ...selectedProduct,
-                          price: e.target.value,
-                        })
-                      }
-                      required
-                    />
-
-                    <Label htmlFor="stock">Stock</Label>
-                    <Input
-                      type="number"
-                      id="stock"
-                      value={selectedProduct?.stock || ""}
-                      onChange={(e) =>
-                        setSelectedProduct({
-                          ...selectedProduct,
-                          stock: e.target.value,
-                        })
-                      }
-                      required
-                    />
-
-                    <Label htmlFor="category">Category</Label>
-                    <Select
-                      value={selectedProduct?.category}
-                      onValueChange={(value) =>
-                        setSelectedProduct({
-                          ...selectedProduct,
-                          category: value,
-                        })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((cat) => (
-                          <SelectItem key={cat} value={cat}>
-                            {cat}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
-                    <Label>Product Images</Label>
-                    <div className="flex space-x-2">
-                      {imagePreview.map((img, index) => (
-                        <div key={index} className="relative">
-                          <img
-                            src={img}
-                            alt="Preview"
-                            className="w-20 h-20 object-cover rounded-lg"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeImage(index)}
-                            className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+                  <ScrollArea className="max-h-[70vh] p-6">
+                    <form onSubmit={handleUpdateProduct} className="space-y-6">
+                      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <div>
+                          <Label
+                            htmlFor="name"
+                            className="text-gray-700 dark:text-gray-200"
                           >
-                            ×
-                          </button>
+                            Product Name
+                          </Label>
+                          <Input
+                            id="name"
+                            value={formData.name || ""}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                name: e.target.value,
+                              }))
+                            }
+                            required
+                            className="mt-1 bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
+                          />
                         </div>
-                      ))}
-                    </div>
-                    <Input
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="mt-2"
-                    />
+                        <div>
+                          <Label
+                            htmlFor="category"
+                            className="text-gray-700 dark:text-gray-200"
+                          >
+                            Category
+                          </Label>
+                          <Select
+                            value={formData.category || ""}
+                            onValueChange={(value) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                category: value,
+                              }))
+                            }
+                          >
+                            <SelectTrigger className="mt-1 bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white">
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700">
+                              {categories.map((cat) => (
+                                <SelectItem
+                                  key={cat}
+                                  value={cat}
+                                  className="text-gray-900 dark:text-white"
+                                >
+                                  {cat}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
 
-                    <div className="flex justify-end space-x-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setOpen(false)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button type="submit" disabled={isPendingUpdate}>
-                        {isPendingUpdate ? "Updating..." : "Save Changes"}
-                      </Button>
-                    </div>
-                  </form>
+                      <div>
+                        <Label
+                          htmlFor="description"
+                          className="text-gray-700 dark:text-gray-200"
+                        >
+                          Description
+                        </Label>
+                        <Textarea
+                          id="description"
+                          value={formData.description || ""}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              description: e.target.value,
+                            }))
+                          }
+                          rows={4}
+                          required
+                          className="mt-1 bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                        <div>
+                          <Label
+                            htmlFor="price"
+                            className="text-gray-700 dark:text-gray-200"
+                          >
+                            Price
+                          </Label>
+                          <Input
+                            id="price"
+                            type="number"
+                            value={formData.price || ""}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                price: parseFloat(e.target.value),
+                              }))
+                            }
+                            min="0"
+                            step="0.01"
+                            required
+                            className="mt-1 bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
+                          />
+                        </div>
+                        <div>
+                          <Label
+                            htmlFor="stock"
+                            className="text-gray-700 dark:text-gray-200"
+                          >
+                            Stock
+                          </Label>
+                          <Input
+                            id="stock"
+                            type="number"
+                            value={formData.stock || ""}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                stock: parseInt(e.target.value),
+                              }))
+                            }
+                            min="0"
+                            required
+                            className="mt-1 bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
+                          />
+                        </div>
+                        <div>
+                          <Label
+                            htmlFor="ratings"
+                            className="text-gray-700 dark:text-gray-200"
+                          >
+                            Ratings
+                          </Label>
+                          <Input
+                            id="ratings"
+                            type="number"
+                            value={formData.ratings || ""}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                ratings: parseFloat(e.target.value),
+                              }))
+                            }
+                            min="0"
+                            max="5"
+                            step="0.1"
+                            required
+                            className="mt-1 bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label className="text-gray-700 dark:text-gray-200">
+                          Product Images
+                        </Label>
+                        <div className="grid grid-cols-2 gap-4 mt-2 sm:grid-cols-3 md:grid-cols-4">
+                          {imagePreviews.map((img, index) => (
+                            <div key={index} className="relative group">
+                              <img
+                                src={img}
+                                alt={`Preview ${index}`}
+                                className="w-full h-24 object-cover rounded-lg"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="icon"
+                                onClick={() => removeImage(index)}
+                                className="absolute top-2 right-2 w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <X size={16} />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-4">
+                          <label className="w-full flex flex-col items-center justify-center h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                            <div className="flex flex-col items-center justify-center">
+                              <Upload className="w-8 h-8 mb-2 text-gray-500 dark:text-gray-400" />
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                Add Images (Max 10MB)
+                              </p>
+                            </div>
+                            <Input
+                              type="file"
+                              multiple
+                              accept="image/*"
+                              onChange={handleImageChange}
+                              className="hidden"
+                            />
+                          </label>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end gap-3 pt-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setOpen(false)}
+                          className="dark:border-gray-600 dark:text-white"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          type="submit"
+                          disabled={isPendingUpdate}
+                          className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white"
+                        >
+                          {isPendingUpdate ? "Updating..." : "Save Changes"}
+                        </Button>
+                      </div>
+                    </form>
+                  </ScrollArea>
                 </DialogContent>
               </Dialog>
               <Button

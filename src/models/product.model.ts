@@ -20,7 +20,7 @@ const productSchema = new Schema<IProduct>(
     images: [
       {
         url: { type: String, required: true },
-        public_id: { type: String, required: true }, // Cloudinary public ID
+        public_id: { type: String, required: true }, // cloudinary public ID
       },
     ],
     stock: { type: Number, required: true, default: 0, min: 0 },

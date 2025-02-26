@@ -4,6 +4,8 @@ import Link from "next/link";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { GiShoppingCart } from "react-icons/gi";
+import { ModeToggle } from "./ui/ModeToggle/ModeToggle";
+import Image from "next/image";
 
 const Navbar = () => {
   const { data: session, status } = useSession();
@@ -37,7 +39,7 @@ const Navbar = () => {
         {/* Logo */}
         <Link
           href="/"
-          className="text-xl font-semibold text-gray-900 dark:text-white"
+          className="md:text-xl sm:text-sm font-semibold text-gray-900 dark:text-white"
         >
           NextGenElectronics
         </Link>
@@ -79,8 +81,10 @@ const Navbar = () => {
                 }}
                 className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
               >
-                <img
+                <Image
                   className="w-8 h-8 rounded-full"
+                  width={100}
+                  height={100}
                   src={
                     session.user?.image ||
                     "https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png"
@@ -137,6 +141,8 @@ const Navbar = () => {
               </Link>
             </div>
           )}
+          {/* Dark mode Theme provider */}
+          <ModeToggle />
 
           {/* Mobile Menu Button */}
           <button

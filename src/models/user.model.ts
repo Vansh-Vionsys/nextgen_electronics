@@ -23,7 +23,7 @@ const userSchema = new Schema<IUser>(
     authProviderId: {
       type: String,
       unique: true,
-      sparse: true, // Allows null values for non-google users
+      sparse: true, // allows null values for non-google users
     },
     authProviderName: {
       type: String,
@@ -34,7 +34,7 @@ const userSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
-//hashing the password if it changes
+// hashing the password if it changes
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 10);

@@ -6,8 +6,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_CLOUD_SECRET,
 });
 
-// Validate Cloudinary configuration
-
 if (
   !process.env.CLOUDINARY_CLOUD_NAME ||
   !process.env.CLOUDINARY_CLOUD_KEY ||

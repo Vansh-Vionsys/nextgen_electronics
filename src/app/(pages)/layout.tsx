@@ -5,7 +5,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+  modal,
+}: Readonly<{ children: React.ReactNode; modal: React.ReactNode }>) {
   return (
     <Providers>
       <header className="z-50">
@@ -13,6 +14,7 @@ export default function RootLayout({
       </header>
       <Toaster position="top-center" reverseOrder={false} />
       {children}
+      {modal}
       <footer>
         <Footer />
       </footer>

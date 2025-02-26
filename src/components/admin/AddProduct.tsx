@@ -2,6 +2,17 @@
 import React, { useState, useRef, useEffect } from "react";
 import { X, Upload } from "lucide-react";
 import useAddProduct from "@/features/productMutations/useAddProduct";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 interface ImageData {
   file: File;
@@ -28,7 +39,6 @@ const CATEGORIES = [
 ] as const;
 
 const AddProduct = () => {
-  // reactQuery
   const { addProduct, isAdding, isError } = useAddProduct();
 
   const [product, setProduct] = useState<ProductData>({
@@ -51,9 +61,7 @@ const AddProduct = () => {
   }, [imageInputs]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setProduct((prev) => ({
@@ -70,11 +78,11 @@ const AddProduct = () => {
     if (files) {
       const validFiles = Array.from(files).filter(
         (file) => file.size <= 10 * 1024 * 1024
-      ); // Max 10MB
+      );
       if (validFiles.length < files.length) {
         alert("Some files are too large. Max size is 10MB.");
       }
-      const newImages: ImageData[] = Array.from(files).map((file) => ({
+      const newImages: ImageData[] = validFiles.map((file) => ({
         file,
         preview: URL.createObjectURL(file),
         public_id: `${Date.now()}_${file.name}`,
@@ -97,12 +105,7 @@ const AddProduct = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const productWithImages = {
-      ...product,
-      images: imageInputs,
-    };
-    console.log("Product Data:", productWithImages);
-    // Here you would typically send the data to your backend using FormData
+    const productWithImages = { ...product, images: imageInputs };
     const formData = new FormData();
     formData.append("name", product.name);
     formData.append("description", product.description);
@@ -115,7 +118,7 @@ const AddProduct = () => {
       formData.append(`images`, image.file);
       formData.append(`public_ids`, image.public_id);
     });
-    console.log("formData: ", formData);
+
     addProduct(formData, {
       onSuccess: () => {
         setProduct({
@@ -133,123 +136,118 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4">
+    <div className="min-h-screen bg-gray-100 dark:bg-slate-800 py-8 px-4">
       <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
             Add New Product
           </h1>
           {isError && (
-            <p className="text-red-500 text-sm">
+            <p className="text-red-500 text-sm mb-4">
               Failed to add product. Try again.
             </p>
           )}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Product Name
-                </label>
-                <input
-                  type="text"
+                <Label htmlFor="name">Product Name</Label>
+                <Input
+                  id="name"
                   name="name"
                   value={product.name}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   required
+                  className="mt-1 dark:bg-gray-800"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Description
-                </label>
-                <textarea
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
                   name="description"
                   value={product.description}
                   onChange={handleInputChange}
                   rows={4}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   required
+                  className="mt-1 dark:bg-gray-800"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Price
-                  </label>
-                  <input
-                    type="number"
+                  <Label htmlFor="price">Price</Label>
+                  <Input
+                    id="price"
                     name="price"
+                    type="number"
                     value={product.price}
                     onChange={handleInputChange}
                     min="0"
                     step="0.01"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     required
+                    className="mt-1 dark:bg-gray-800"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Category
-                  </label>
-                  <select
+                  <Label htmlFor="category">Category</Label>
+                  <Select
                     name="category"
                     value={product.category}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    required
+                    onValueChange={(value) =>
+                      setProduct((prev) => ({ ...prev, category: value }))
+                    }
                   >
-                    {CATEGORIES.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger className="mt-1 dark:bg-gray-800">
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Stock
-                  </label>
-                  <input
-                    type="number"
+                  <Label htmlFor="stock">Stock</Label>
+                  <Input
+                    id="stock"
                     name="stock"
+                    type="number"
                     value={product.stock}
                     onChange={handleInputChange}
                     min="0"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     required
+                    className="mt-1 dark:bg-gray-800"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Ratings
-                  </label>
-                  <input
-                    type="number"
+                  <Label htmlFor="ratings">Ratings</Label>
+                  <Input
+                    id="ratings"
                     name="ratings"
+                    type="number"
                     value={product.ratings}
                     onChange={handleInputChange}
                     min="0"
                     max="5"
                     step="0.1"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     required
+                    className="mt-1 dark:bg-gray-800"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Product Images
-                </label>
-                <div className="space-y-4">
+                <Label>Product Images</Label>
+                <div className="space-y-4 mt-2">
                   {imageInputs.length > 0 && (
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       {imageInputs.map((image, index) => (
@@ -259,26 +257,28 @@ const AddProduct = () => {
                             alt={`Preview ${index + 1}`}
                             className="w-full h-32 object-cover rounded-lg"
                           />
-                          <button
+                          <Button
                             type="button"
+                            variant="destructive"
+                            size="icon"
                             onClick={() => removeImage(index)}
-                            className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                           >
                             <X size={16} />
-                          </button>
+                          </Button>
                         </div>
                       ))}
                     </div>
                   )}
                   <div className="flex items-center justify-center w-full">
-                    <label className="w-full flex flex-col items-center justify-center h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                    <label className="w-full flex flex-col items-center justify-center h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600">
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <Upload className="w-8 h-8 mb-2 text-gray-500" />
-                        <p className="mb-2 text-sm text-gray-500">
+                        <Upload className="w-8 h-8 mb-2 text-gray-500 dark:text-gray-400" />
+                        <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
                           <span className="font-semibold">Click to upload</span>{" "}
                           or drag and drop
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           PNG, JPG, GIF up to 10MB
                         </p>
                       </div>
@@ -296,15 +296,9 @@ const AddProduct = () => {
               </div>
             </div>
 
-            <div className="pt-4">
-              <button
-                type="submit"
-                disabled={isAdding}
-                className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:bg-gray-400"
-              >
-                {isAdding ? "Adding Product..." : "Add Product"}
-              </button>
-            </div>
+            <Button type="submit" disabled={isAdding} className="w-full mt-4">
+              {isAdding ? "Adding Product..." : "Add Product"}
+            </Button>
           </form>
         </div>
       </div>

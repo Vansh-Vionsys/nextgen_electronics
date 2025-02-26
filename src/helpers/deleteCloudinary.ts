@@ -3,13 +3,13 @@ import cloudinary from "./cloudinary";
 const deleteCloudinary = async (publicIds: string | string[]) => {
   try {
     if (!publicIds || (Array.isArray(publicIds) && publicIds.length === 0)) {
-      throw new Error("No public IDs provided for deletion!");
+      throw new Error("No public IDs provided for deletion");
     }
 
-    // Convert single string to an array
+    // convert single string to an array
     const idsToDelete = Array.isArray(publicIds) ? publicIds : [publicIds];
 
-    // Perform deletion
+    // perform deletion
     const deleteResponses = await Promise.all(
       idsToDelete.map(async (publicId) => {
         console.log(`Attempting to delete image: ${publicId}`);
