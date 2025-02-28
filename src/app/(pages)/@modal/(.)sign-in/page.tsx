@@ -1,9 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
 import { useState } from "react";
-import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -26,6 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import AuthButton from "@/components/AuthButton";
+import useLogin from "@/features/authMutations/useLogin";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -35,8 +34,8 @@ const formSchema = z.object({
 const SignInModal = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(true);
+  const { login, loginPending } = useLogin();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -46,24 +45,12 @@ const SignInModal = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
-    const result = await signIn("credentials", {
+    login({
       email: values.email,
       password: values.password,
-      redirect: false,
     });
-    setIsLoading(false);
-
-    if (result?.error) {
-      toast.error(result.error);
-    }
-    if (result?.ok) {
-      toast.success("Login successful");
-      setOpen(false);
-      router.push("/");
-    }
+    setOpen(false);
   };
-
   return (
     <Dialog open={open} onOpenChange={() => router.back()}>
       <DialogContent className="sm:max-w-[425px]">
@@ -113,8 +100,8 @@ const SignInModal = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Loading..." : "Sign In"}
+            <Button type="submit" className="w-full" disabled={loginPending}>
+              {loginPending ? "Loading..." : "Sign In"}
             </Button>
           </form>
         </Form>

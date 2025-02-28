@@ -5,7 +5,7 @@ import Product from "@/models/product.model";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-// add product API with cloudinary image uploads (POST)
+// POST: add product API with cloudinary image uploads
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// get all products (GET)
+// GET: Fetch all products
 export async function GET() {
   try {
     await dbConnect();

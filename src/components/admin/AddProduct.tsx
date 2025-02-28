@@ -279,7 +279,7 @@ const AddProduct = () => {
                           or drag and drop
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          PNG, JPG, GIF up to 10MB
+                          Images up to 10MB
                         </p>
                       </div>
                       <input

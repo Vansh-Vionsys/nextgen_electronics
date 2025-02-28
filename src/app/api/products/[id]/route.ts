@@ -6,7 +6,7 @@ import Product from "@/models/product.model";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-// get single product by id (GET)
+// GET: Fetch single product by id
 export async function GET(
   req: NextRequest,
   context: { params: { id: string } }
@@ -27,7 +27,7 @@ export async function GET(
   }
 }
 
-// update product by id (PUT)
+// PUT: update product by id
 export async function PUT(
   req: NextRequest,
   context: { params: { id: string } }
@@ -126,7 +126,7 @@ export async function PUT(
   }
 }
 
-// remove a product by id (DELETE)
+// DELETE: remove a product by id
 export async function DELETE(
   req: NextRequest,
   context: { params: { id: string } }
@@ -141,9 +141,9 @@ export async function DELETE(
       );
     }
 
+    const { id } = context.params;
     // connect to DB
     await dbConnect();
-    const { id } = context.params;
 
     // find product
     const product = await Product.findById(id);

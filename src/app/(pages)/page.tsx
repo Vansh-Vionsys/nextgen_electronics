@@ -4,8 +4,6 @@ import Link from "next/link";
 import React from "react";
 
 const Page = () => {
-  const { data: session } = useSession();
-
   return (
     <div className="flex flex-col items-center justify-center w-full text-center px-6 py-16 sm:py-20 bg-gradient-to-r from-green-50/50 via-teal-50 to-green-50/50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 h-screen">
       <div className="border border-gray-300 dark:border-gray-500 rounded-lg py-2 px-4 text-gray-700 dark:text-gray-300 text-xs sm:text-sm mb-4 sm:mb-5 transition hover:text-gray-500 dark:hover:text-gray-400">
@@ -31,22 +29,12 @@ const Page = () => {
         underwriting to claims processing, our intelligent system streamlines
         and enhances every aspect of your insurance operations.
       </h2>
-
-      {session?.user.role === "admin" ? (
-        <Link
-          className="bg-orange-600 dark:bg-gray-800 rounded-lg text-white dark:text-gray-300 font-medium px-5 py-3 mt-6 sm:mt-10 text-sm sm:text-base hover:bg-orange-500 dark:hover:bg-gray-600 transition"
-          href="/admin/products"
-        >
-          Browse Products
-        </Link>
-      ) : (
-        <Link
-          className="bg-orange-600 dark:bg-gray-800 rounded-lg text-white dark:text-gray-300 font-medium px-5 py-3 mt-6 sm:mt-10 text-sm sm:text-base hover:bg-orange-500 dark:hover:bg-gray-600 transition"
-          href="/products"
-        >
-          Browse Products
-        </Link>
-      )}
+      <Link
+        className="bg-orange-600 dark:bg-gray-800 rounded-lg text-white dark:text-gray-300 font-medium px-5 py-3 mt-6 sm:mt-10 text-sm sm:text-base hover:bg-orange-500 dark:hover:bg-gray-600 transition"
+        href="/products"
+      >
+        Browse Products
+      </Link>
     </div>
   );
 };

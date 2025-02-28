@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
       {
         hostname: "e7.pngegg.com",
       },
+      {
+        hostname: "res.cloudinary.com",
+      },
+      { hostname: "images.unsplash.com" },
     ],
   },
 };

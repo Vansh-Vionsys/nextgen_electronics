@@ -1,10 +1,8 @@
 "use client";
 import AuthButton from "@/components/AuthButton";
-import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
-import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -18,6 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import useLogin from "@/features/authMutations/useLogin";
 
 // Define the form schema using Zod
 const formSchema = z.object({
@@ -28,7 +27,8 @@ const formSchema = z.object({
 const SignIn = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+
+  const { login, loginPending } = useLogin();
 
   // Initialize the form with react-hook-form and zod
   const form = useForm<z.infer<typeof formSchema>>({
@@ -40,21 +40,10 @@ const SignIn = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
-    const result = await signIn("credentials", {
+    login({
       email: values.email,
       password: values.password,
-      redirect: false,
     });
-    setIsLoading(false);
-
-    if (result?.error) {
-      toast.error(result.error);
-    }
-    if (result?.ok) {
-      toast.success("Login successful");
-      router.push("/");
-    }
   };
 
   return (
@@ -106,8 +95,8 @@ const SignIn = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Loading..." : "Sign In"}
+              <Button type="submit" className="w-full" disabled={loginPending}>
+                {loginPending ? "Loading..." : "Sign In"}
               </Button>
             </form>
           </Form>

@@ -25,7 +25,7 @@ const Navbar = () => {
 
   const adminNavLinks = [
     { name: "Dashboard", href: "/admin/dashboard" },
-    { name: "Products", href: "/admin/products" },
+    { name: "Products", href: "/products" },
     { name: "Manage Products", href: "/admin/manage-products" },
     { name: "All Orders", href: "/admin/all-orders" },
   ];
@@ -98,7 +98,7 @@ const Navbar = () => {
                 <div className="absolute right-0 top-12 z-50 w-48 bg-white dark:bg-gray-700 shadow-lg rounded-lg">
                   <div className="px-4 py-3">
                     <span className="block text-sm text-gray-900 dark:text-white">
-                      {session.user?.name}
+                      {session.user?.name} {isAdmin ? "- Admin" : ""}
                     </span>
                     <span className="block text-sm text-gray-500 dark:text-gray-400">
                       {session.user?.email}

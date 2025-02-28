@@ -151,17 +151,9 @@ const Page = () => {
           </div>
 
           {/* Buttons */}
-          <div className="flex space-x-4 mb-6">
-            <Button className="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400">
-              Add to Cart
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full dark:border-gray-600 dark:hover:bg-gray-700"
-            >
-              Wishlist
-            </Button>
-          </div>
+          <Button className="w-52 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400">
+            Add to Cart
+          </Button>
         </div>
       </div>
     </div>

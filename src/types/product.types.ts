@@ -16,3 +16,14 @@ export interface IProduct extends Document {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export interface Product {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  category: string;
+  ratings: number;
+  images: { url: string; public_id: string }[];
+}
