@@ -1,9 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
-import { signIn } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
-const useLogin = () => {
+export const useLogin = () => {
   const router = useRouter();
 
   const { mutate, isPending } = useMutation({
@@ -43,4 +43,23 @@ const useLogin = () => {
   };
 };
 
-export default useLogin;
+export const useLogout = () => {
+  const { mutate, isPending, isError } = useMutation({
+    mutationFn: () => signOut(),
+    onSuccess: () => {
+      toast.success("Logged Out Successfully!!");
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      console.log(error?.response?.data?.error);
+      toast.error(
+        error?.response?.data?.error || "Failed to logout. Please try again..."
+      );
+    },
+  });
+  return {
+    logout: mutate,
+    isLogoutPending: isPending,
+    isLogoutError: isError,
+  };
+};

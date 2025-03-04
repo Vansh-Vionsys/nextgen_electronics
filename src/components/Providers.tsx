@@ -6,9 +6,9 @@ import { SessionProvider, useSession } from "next-auth/react";
 import { Toaster } from "react-hot-toast";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
 
-const queryClient = new QueryClient();
-
 const Providers = ({ children }: { children: React.ReactNode }) => {
+  const queryClient = new QueryClient();
+
   return (
     <ThemeProvider
       attribute="class"
@@ -31,17 +31,18 @@ export default Providers;
 
 export const SessionLoader = ({ children }: { children: React.ReactNode }) => {
   const { status } = useSession();
-  console.log("Session Status:", status);
-
+  console.log("Status:", status);
   if (status === "loading") {
+    console.log("SessionLoader rendered");
     return (
-      <div className="h-screen w-screen flex-col gap-4 flex items-center justify-center">
-        <div className="w-20 h-20 border-4 border-transparent text-blue-400 text-4xl animate-spin flex items-center justify-center border-t-blue-400 rounded-full">
-          <div className="w-16 h-16 border-4 border-transparent text-red-400 text-2xl animate-spin flex items-center justify-center border-t-red-400 rounded-full"></div>
+      <div className="flex items-center justify-center h-screen">
+        <div className="relative">
+          <div className="h-24 w-24 rounded-full border-t-8 border-b-8 border-gray-200"></div>
+          <div className="absolute top-0 left-0 h-24 w-24 rounded-full border-t-8 border-b-8 border-blue-500 animate-spin"></div>
         </div>
       </div>
     );
   }
 
-  return <>{children}</>;
+  return children;
 };

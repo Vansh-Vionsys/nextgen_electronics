@@ -18,8 +18,9 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { TbShoppingCartExclamation } from "react-icons/tb";
+import Link from "next/link";
 
-const CartPage = () => {
+const Cart = () => {
   const { data: session } = useSession();
   const userId = session?.user?.id || null;
   const { getAllCartProduct, getCartLoading } = useGetCartProduct(userId);
@@ -200,15 +201,10 @@ const CartPage = () => {
                   </div>
                 </div>
               ))}
-              <Button
-                variant="outline"
-                className="mt-6 group hover:bg-primary hover:text-black transition-colors border-gray-300 dark:border-gray-600 rounded-lg"
-                asChild
-              >
-                <a href="/products" className="flex items-center">
-                  <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                  Continue Shopping
-                </a>
+              <Button className="mt-6">
+                <Link href="/products" className="flex items-center">
+                  <ArrowLeft className="h-4 w-4" /> Continue Shopping
+                </Link>
               </Button>
             </CardContent>
           </Card>
@@ -218,4 +214,4 @@ const CartPage = () => {
   );
 };
 
-export default CartPage;
+export default Cart;

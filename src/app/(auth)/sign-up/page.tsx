@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import useRegister from "@/features/authMutations/useRegister";
+import { useRegister } from "@/features/authMutations/useRegister";
 import { useRouter } from "next/navigation";
 import { IRegisterUser } from "@/types/user.types";
 import AuthButton from "@/components/AuthButton";
@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import Spinner from "@/components/Spinner";
 
 // Define the form schema using Zod
 const formSchema = z.object({
@@ -120,7 +121,7 @@ const SignUp = () => {
                 disabled={registerLoading}
                 className="w-full"
               >
-                {registerLoading ? "loading..." : "Sign Up"}
+                {registerLoading ? <Spinner /> : "Sign Up"}
               </Button>
             </form>
           </Form>

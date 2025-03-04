@@ -1,4 +1,3 @@
-//contain operation like update and delete
 "use client";
 import React, { useState } from "react";
 import {
@@ -22,8 +21,9 @@ import {
 import { Textarea } from "../ui/textarea";
 import { AspectRatio } from "../ui/aspect-ratio";
 import { Upload, X } from "lucide-react";
-import { IProduct, Product } from "@/types/product.types";
+import { Product } from "@/types/product.types";
 import useUpdateProduct from "@/features/productMutations/useUpdateProduct";
+import Spinner from "../Spinner";
 
 const categories = [
   "Mobile & Accessories",
@@ -102,7 +102,7 @@ const EditProduct = ({ product }: { product: Product }) => {
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="w-full dark:border-gray-600 dark:text-white rounded-none"
+          className="w-full dark:border-gray-700 dark:text-white text-black rounded-none dark:bg-gray-900 bg-white"
           onClick={() => handleUpdateClick(product)}
         >
           Update
@@ -281,12 +281,8 @@ const EditProduct = ({ product }: { product: Product }) => {
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                disabled={isPendingUpdate}
-                className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
-              >
-                {isPendingUpdate ? "Updating..." : "Save Changes"}
+              <Button type="submit" disabled={isPendingUpdate}>
+                {isPendingUpdate ? <Spinner /> : "Update Product"}
               </Button>
             </div>
           </form>

@@ -12,8 +12,8 @@ export async function GET(
   context: { params: { id: string } }
 ) {
   try {
-    await dbConnect();
     const { id } = context.params;
+    await dbConnect();
     const product = await Product.findById(id);
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });

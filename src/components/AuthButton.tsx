@@ -1,13 +1,12 @@
 "use client";
-import { signIn } from "next-auth/react";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuthLogin } from "@/features/authMutations/useRegister";
+import Spinner from "./Spinner";
 
 const AuthButton = () => {
-  const handleSubmit = () => {
-    signIn("google", { callbackUrl: "/" });
-  };
+  const { authLogin, isAuthLoginPending } = useAuthLogin();
 
   return (
     <section>
@@ -17,7 +16,7 @@ const AuthButton = () => {
           "w-full flex items-center justify-center gap-3 py-2 transition-all duration-300 ease-in-out",
           "bg-white text-gray-800 hover:shadow focus:shadow-sm focus:shadow-outline"
         )}
-        onClick={handleSubmit}
+        onClick={() => authLogin("google")}
       >
         <div className="bg-white p-1.5 rounded-full">
           <svg className="w-3 h-3" viewBox="0 0 533.5 544.3">
@@ -39,7 +38,7 @@ const AuthButton = () => {
             />
           </svg>
         </div>
-        <span>Continue with Google</span>
+        {isAuthLoginPending ? <Spinner /> : "Continue with Google"}
       </Button>
     </section>
   );

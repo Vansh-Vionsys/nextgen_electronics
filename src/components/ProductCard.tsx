@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import Spinner from "./Spinner";
 
 const ProductCard = ({ product }: { product: any }) => {
   const { data: session } = useSession();
@@ -70,7 +71,7 @@ const ProductCard = ({ product }: { product: any }) => {
   };
 
   return (
-    <Card className="w-full bg-white dark:bg-black text-gray-900 dark:text-white border border-gray-200 dark:border-0 overflow-hidden h-[480px] flex flex-col">
+    <Card className="w-full bg-white text-gray-900 dark:text-white dark:border-[1px] overflow-hidden h-[480px] flex flex-col shadow-xl dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl">
       <div className="relative h-48 flex-shrink-0">
         <Image
           width={500}
@@ -110,15 +111,15 @@ const ProductCard = ({ product }: { product: any }) => {
       {isAdmin ? (
         <EditProduct product={product} />
       ) : (
-        <div className="px-6 pb-4 flex gap-4 flex-shrink-0">
+        <div className="px-4 pb-4 flex gap-4 flex-shrink-0">
           <Select
             value={quantity.toString()}
             onValueChange={handleQuantityChange}
           >
-            <SelectTrigger className="w-16 h-10 border-0 bg-transparent focus:ring-0 text-gray-900 dark:text-white">
+            <SelectTrigger className="w-16 h-9 border-2 bg-transparent focus:ring-0 text-gray-900 dark:text-white">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="max-h-60 overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+            <SelectContent className="max-h-60 overflow-y-auto bg-white dark:bg-gray-800 border border-white dark:border-black rounded-lg ">
               {Array.from(
                 { length: Math.min(product.stock) },
                 (_, i) => i + 1
@@ -135,11 +136,11 @@ const ProductCard = ({ product }: { product: any }) => {
           </Select>
           <Button
             onClick={() => handleSubmit(product._id)}
-            className="flex-1 bg-gray-900 dark:bg-white hover:bg-gray-700 dark:hover:bg-zinc-200 text-white dark:text-black text-sm rounded-md"
+            className="flex-1 "
             disabled={isAddingCart}
           >
-            <ShoppingCart className="mr-2 h-2 w-5" />{" "}
-            {isAddingCart ? "Adding..." : "Add to cart"}
+            <ShoppingCart className="mr-2 h-2 w-5" />
+            {isAddingCart ? <Spinner /> : "Add to cart"}
           </Button>
         </div>
       )}
@@ -152,7 +153,7 @@ const ProductCard = ({ product }: { product: any }) => {
             className="w-full hover:underline hover:text-red-700 text-red-700 hover:bg-gray-100 dark:hover:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 rounded-none h-10"
             disabled={isDeletePending}
           >
-            {isDeletePending ? "Deleting..." : "Delete"}
+            {isDeletePending ? <Spinner /> : "Delete"}
           </Button>
         </CardFooter>
       ) : (
@@ -160,7 +161,7 @@ const ProductCard = ({ product }: { product: any }) => {
           <CardFooter className="p-0 flex-shrink-0">
             <Button
               variant="ghost"
-              className="w-full hover:underline text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 rounded-none h-10"
+              className="w-full hover:underline text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-900 border-t border-gray-200 dark:border-zinc-700 rounded-none h-10"
             >
               View Details
             </Button>
@@ -185,7 +186,7 @@ const ProductGrid = () => {
   }
 
   return (
-    <div className="flex justify-center items-center bg-gray-100 dark:bg-slate-800 p-4 min-h-screen">
+    <div className="flex justify-center items-center p-4 min-h-screen">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl w-full">
         {getAllProducts?.map((product: IProduct, index: number) => (
           <ProductCard key={product?.id || index} product={product} />

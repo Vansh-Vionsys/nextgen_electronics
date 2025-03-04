@@ -5,7 +5,7 @@ import Product from "@/models/product.model";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-// GET: user's cart
+// GET: fetch user's cart
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session)

@@ -1,5 +1,4 @@
 "use client";
-
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -24,7 +23,8 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import AuthButton from "@/components/AuthButton";
-import useLogin from "@/features/authMutations/useLogin";
+import { useLogin } from "@/features/authMutations/useLogin";
+import Spinner from "@/components/Spinner";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -85,7 +85,7 @@ const SignInModal = () => {
                         type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
                         {...field}
-                        className="pr-10"
+                        className="pr-10 [appearance:textfield]"
                       />
                       <button
                         type="button"
@@ -101,7 +101,7 @@ const SignInModal = () => {
               )}
             />
             <Button type="submit" className="w-full" disabled={loginPending}>
-              {loginPending ? "Loading..." : "Sign In"}
+              {loginPending ? <Spinner /> : "Sign In"}
             </Button>
           </form>
         </Form>

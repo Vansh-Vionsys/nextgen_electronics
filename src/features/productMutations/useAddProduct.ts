@@ -1,5 +1,4 @@
 import { addProductAPI } from "@/services/productsAPI";
-import { Product } from "@arcjet/next";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 

@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import Spinner from "../Spinner";
 
 interface ImageData {
   file: File;
@@ -297,7 +298,7 @@ const AddProduct = () => {
             </div>
 
             <Button type="submit" disabled={isAdding} className="w-full mt-4">
-              {isAdding ? "Adding Product..." : "Add Product"}
+              {isAdding ? <Spinner /> : "Add Product"}
             </Button>
           </form>
         </div>

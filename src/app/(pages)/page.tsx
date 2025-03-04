@@ -1,15 +1,14 @@
 "use client";
-import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React from "react";
 
-const Page = () => {
+const Home = () => {
   return (
     <div className="flex flex-col items-center justify-center w-full text-center px-6 py-16 sm:py-20 bg-gradient-to-r from-green-50/50 via-teal-50 to-green-50/50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 h-screen">
       <div className="border border-gray-300 dark:border-gray-500 rounded-lg py-2 px-4 text-gray-700 dark:text-gray-300 text-xs sm:text-sm mb-4 sm:mb-5 transition hover:text-gray-500 dark:hover:text-gray-400">
         Forget about spending hundreds $
       </div>
-
       <h1 className="max-w-3xl font-display text-4xl sm:text-6xl font-bold tracking-normal text-gray-900 dark:text-gray-300">
         <span className="relative text-orange-500 dark:text-orange-300">
           <svg
@@ -23,20 +22,22 @@ const Page = () => {
           <span className="relative">NextGenElectronics</span>
         </span>
       </h1>
-
       <h2 className="mx-auto mt-6 sm:mt-12 max-w-xl text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
         Experience the future of insurance with our cutting-edge AI tool. From
         underwriting to claims processing, our intelligent system streamlines
         and enhances every aspect of your insurance operations.
       </h2>
-      <Link
-        className="bg-orange-600 dark:bg-gray-800 rounded-lg text-white dark:text-gray-300 font-medium px-5 py-3 mt-6 sm:mt-10 text-sm sm:text-base hover:bg-orange-500 dark:hover:bg-gray-600 transition"
-        href="/products"
-      >
-        Browse Products
+      <Link href="/products">
+        <Button
+          className="bg-orange-600 dark:bg-gray-800 rounded-lg text-white
+      dark:text-gray-300 font-medium px-5 py-3 mt-6 sm:mt-10 text-sm
+      sm:text-base hover:bg-orange-500 dark:hover:bg-gray-600 transition"
+        >
+          Browse Products
+        </Button>
       </Link>
     </div>
   );
 };
 
-export default Page;
+export default Home;

@@ -1,7 +1,6 @@
 "use client";
 import AuthButton from "@/components/AuthButton";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,7 +15,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import useLogin from "@/features/authMutations/useLogin";
+import { useLogin } from "@/features/authMutations/useLogin";
+import Spinner from "@/components/Spinner";
 
 // Define the form schema using Zod
 const formSchema = z.object({
@@ -25,7 +25,6 @@ const formSchema = z.object({
 });
 
 const SignIn = () => {
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 
   const { login, loginPending } = useLogin();
@@ -96,7 +95,7 @@ const SignIn = () => {
                 )}
               />
               <Button type="submit" className="w-full" disabled={loginPending}>
-                {loginPending ? "Loading..." : "Sign In"}
+                {loginPending ? <Spinner /> : "Sign In"}
               </Button>
             </form>
           </Form>

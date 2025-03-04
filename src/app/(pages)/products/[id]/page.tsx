@@ -5,18 +5,43 @@ import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Label } from "@/components/ui/label";
+import useAddCartProduct from "@/features/cartMutations/useAddCartProduct";
+import { useSession } from "next-auth/react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import Spinner from "@/components/Spinner";
+import { ShoppingCart } from "lucide-react";
 
-const Page = () => {
+const ProductDetails = () => {
   const { id } = useParams();
   const productId = id as string;
-  const { getProductDetail, getProductDetailError, getProductDetailsLoading } =
-    useGetProductById(productId);
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
 
+  const { getProductDetail, getProductDetailsLoading } =
+    useGetProductById(productId);
+  // add to cart functionality
+  const [quantity, setQuantity] = useState(1);
+  const { addCartProduct, isAddingCart } = useAddCartProduct(userId || "");
   const [mainImage, setMainImage] = useState<string | null>(null);
 
+  const handleQuantityChange = (value: string) => {
+    const newQuantity = parseInt(value);
+    if (newQuantity >= 1 && newQuantity <= getProductDetail.stock) {
+      setQuantity(newQuantity);
+    }
+  };
+
+  const handleSubmit = (productId: string) => {
+    const data = { productId, quantity };
+    addCartProduct(data);
+  };
   useEffect(() => {
     if (getProductDetail?.images?.length > 0) {
       setMainImage(getProductDetail.images[0].url);
@@ -47,14 +72,6 @@ const Page = () => {
           </div>
         </div>
       </div>
-    );
-  }
-
-  if (getProductDetailError) {
-    return (
-      <p className="text-center text-red-500 text-lg">
-        Error fetching product details
-      </p>
     );
   }
 
@@ -118,16 +135,14 @@ const Page = () => {
               Availability:{" "}
             </span>
             <Badge
-              variant={getProductDetail.stock > 0 ? "default" : "destructive"}
+              variant="default"
               className={
-                getProductDetail.stock > 0
-                  ? "bg-green-500"
-                  : "bg-red-500 underline"
+                getProductDetail.stock > 10 ? "bg-green-500" : "bg-red-500"
               }
             >
-              {getProductDetail.stock > 0
-                ? `${getProductDetail.stock} items left`
-                : "Out of Stock"}
+              {getProductDetail.stock > 10
+                ? `${getProductDetail.stock} left`
+                : `${getProductDetail.stock} left only`}
             </Badge>
           </div>
 
@@ -138,21 +153,37 @@ const Page = () => {
 
           {/* Quantity Selector */}
           <div className="mb-6 flex items-center space-x-3">
-            <Label htmlFor="quantity" className="font-bold">
-              Quantity:
-            </Label>
-            <Input
-              type="number"
-              id="quantity"
-              min="1"
-              defaultValue="1"
-              className="w-16 text-center"
-            />
+            <span className="font-bold text-gray-600 dark:text-gray-200">
+              Qty:{" "}
+            </span>
+            <Select
+              value={quantity.toString()}
+              onValueChange={handleQuantityChange}
+            >
+              <SelectTrigger className="w-16 h-10 border-0 bg-transparent focus:ring-0 text-gray-900 dark:text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="max-h-60 overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+                {Array.from(
+                  { length: Math.min(getProductDetail.stock) },
+                  (_, i) => i + 1
+                ).map((qty) => (
+                  <SelectItem
+                    key={qty}
+                    value={qty.toString()}
+                    className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    {qty}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Buttons */}
-          <Button className="w-52 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400">
-            Add to Cart
+          <Button onClick={() => handleSubmit(productId)} className="w-52">
+            <ShoppingCart className="mr-2 h-2 w-5" />
+            {isAddingCart ? <Spinner /> : "Add to cart"}
           </Button>
         </div>
       </div>
@@ -160,4 +191,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default ProductDetails;

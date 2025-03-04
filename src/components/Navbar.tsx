@@ -1,206 +1,191 @@
 "use client";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import React, { useState } from "react";
-import toast from "react-hot-toast";
 import { GiShoppingCart } from "react-icons/gi";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ModeToggle } from "./ui/ModeToggle/ModeToggle";
-import Image from "next/image";
+import { useLogout } from "@/features/authMutations/useLogin";
+import useGetCartProduct from "@/features/cartMutations/useGetCartProduct";
+import { Badge } from "@/components/ui/badge";
+import { Menu, X } from "lucide-react";
 
 const Navbar = () => {
-  const { data: session, status } = useSession();
-  console.log("session:", session, "status:", status);
-
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const isLogin = session?.user;
-  const isAdmin = session?.user?.role === "admin"; // Assuming role exists in session
+  const { data: session } = useSession();
+  console.log(session);
+  const userId = session?.user?.id;
+  const isLogin = !!session?.user;
+  const isAdmin = session?.user?.role === "admin";
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { getAllCartProduct } = useGetCartProduct(userId || "");
+  const cartCount = getAllCartProduct?.length || 0;
+  const { logout } = useLogout();
 
   const navLinks = [
     { name: "About", href: "/about" },
-    { name: "My Orders", href: "/my-orders" },
     { name: "Products", href: "/products" },
+    { name: "Orders", href: "/orders" },
     { name: "Contact", href: "/contact" },
   ];
 
   const adminNavLinks = [
     { name: "Dashboard", href: "/admin/dashboard" },
-    { name: "Products", href: "/products" },
-    { name: "Manage Products", href: "/admin/manage-products" },
-    { name: "All Orders", href: "/admin/all-orders" },
+    { name: "Add products", href: "/admin/addProducts" },
+    { name: "Edit products", href: "/products" },
+    { name: "All orders", href: "/admin/allOrders" },
   ];
 
   const linksToDisplay = isAdmin ? adminNavLinks : navLinks;
-  // if (!session?.user.role) return <div>loading......</div>;
+
+  const handleLogout = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    logout();
+  };
 
   return (
-    <nav className="bg-white border-b border-gray-200 dark:bg-gray-900">
-      <div className="max-w-screen-xl flex items-center justify-between mx-auto p-4">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="md:text-xl sm:text-sm font-semibold text-indigo-400"
-        >
-          NextGenElectronics
-        </Link>
+    <nav className="border-b sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="flex items-center space-x-2">
+            <span className="md:text-lg font-bold bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent">
+              NextGenElectronics
+            </span>
+          </Link>
 
-        {/* Desktop Navigation */}
-        <div className="hidden lg:flex items-center space-x-6">
-          {linksToDisplay.map((link, index) => (
-            <Link
-              key={index}
-              href={link.href}
-              className="text-gray-700 hover:text-purple-700 dark:text-gray-300 dark:hover:text-white"
-            >
-              {link.name}
-            </Link>
-          ))}
-        </div>
-
-        {/* Right Side - Profile & Get Started */}
-        <div className="flex items-center gap-4">
-          {/* cart icon */}
-          {!isAdmin && (
-            <div>
-              <Link href="/cart">
-                <div className="flex items-center text-gray-700 dark:text-gray-300 hover:text-purple-700 dark:hover:text-white">
-                  <GiShoppingCart className="w-6 h-6" />
-                </div>
-              </Link>
-            </div>
-          )}
-
-          {/* Profile Avatar - Only if logged in */}
-          {isLogin && (
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsDropdownOpen(!isDropdownOpen);
-                  setIsMenuOpen(false);
-                }}
-                className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-              >
-                <Image
-                  className="w-8 h-8 rounded-full"
-                  width={100}
-                  height={100}
-                  src={
-                    session.user?.image ||
-                    "https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png"
-                  }
-                  alt="User Avatar"
-                />
-              </button>
-
-              {/* Profile Dropdown */}
-              {isDropdownOpen && (
-                <div className="absolute right-0 top-12 z-50 w-48 bg-white dark:bg-gray-700 shadow-lg rounded-lg">
-                  <div className="px-4 py-3">
-                    <span className="block text-sm text-gray-900 dark:text-white">
-                      {session.user?.name} {isAdmin ? "- Admin" : ""}
-                    </span>
-                    <span className="block text-sm text-gray-500 dark:text-gray-400">
-                      {session.user?.email}
-                    </span>
-                  </div>
-                  <ul className="py-2">
-                    <li>
-                      <Link
-                        href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200"
-                      >
-                        Settings
-                      </Link>
-                    </li>
-                    <li>
-                      <button
-                        onClick={() => {
-                          toast.success("Logged out successfully");
-                          signOut();
-                        }}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200"
-                      >
-                        Logout
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Get Started Button - Only in Desktop */}
-          {!isLogin && (
-            <div className="hidden lg:block">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-6">
+            {linksToDisplay.map((link) => (
               <Link
-                href="/sign-in"
-                className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 "
+                key={link.name}
+                href={link.href}
+                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
               >
-                Get Started
+                {link.name}
               </Link>
-            </div>
-          )}
-          {/* Dark mode Theme provider */}
-          <ModeToggle />
+            ))}
+          </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => {
-              setIsMenuOpen(!isMenuOpen);
-              setIsDropdownOpen(false);
-            }}
-            className="lg:hidden p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
-            aria-label="Toggle navigation"
-          >
-            {isMenuOpen ? (
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 011.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
-            ) : (
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
+          {/* Right Side: Cart, Profile, Theme Toggle, Mobile Menu Toggle */}
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            {/* Cart */}
+            {!isAdmin && (
+              <Link href="/cart" className="relative">
+                <Button variant="ghost" size="icon" className="relative">
+                  <GiShoppingCart className="h-5 w-5" />
+                  {cartCount > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 h-4 w-4 p-0 text-[10px] flex items-center justify-center bg-red-600 rounded-full"
+                    >
+                      {cartCount > 9 ? "9+" : cartCount}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
             )}
-          </button>
-        </div>
-      </div>
 
-      {/* Mobile Navigation Menu */}
-      {isMenuOpen && (
-        <div className="lg:hidden bg-gray-100 dark:bg-gray-800">
-          <ul className="flex flex-col items-center py-4 space-y-4">
-            {linksToDisplay.map((link, index) => (
-              <li key={index}>
+            {/* User Profile / Auth */}
+            {isLogin ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full"
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage
+                        src={session.user.image || ""}
+                        alt={session.user.name || ""}
+                      />
+                      <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                        {session.user.name?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium">
+                        {session.user.name} {isAdmin ? "(Admin)" : ""}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {session.user.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings">Settings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button variant="default" size="sm" className="hidden md:block">
+                <Link href="/sign-in">Get Started</Link>
+              </Button>
+            )}
+
+            {/* Theme Toggle */}
+            <ModeToggle />
+
+            {/* Mobile Menu Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden pb-4">
+            <div className="flex flex-col space-y-3 px-2 pt-2">
+              {linksToDisplay.map((link) => (
                 <Link
+                  key={link.name}
                   href={link.href}
-                  className="text-gray-700 hover:text-indigo-700 dark:text-gray-300 dark:hover:text-white"
+                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-2"
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.name}
                 </Link>
-              </li>
-            ))}
-            {!isLogin && (
-              <li>
-                <Link
-                  href="/sign-in"
-                  className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
-                >
-                  Get Started
-                </Link>
-              </li>
-            )}
-          </ul>
-        </div>
-      )}
+              ))}
+              {!isLogin && (
+                <Button asChild variant="default" size="sm" className="mt-2">
+                  <Link
+                    href="/sign-in"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Get Started
+                  </Link>
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </nav>
   );
 };

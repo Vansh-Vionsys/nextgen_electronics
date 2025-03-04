@@ -1,7 +1,7 @@
 import AddProduct from "@/components/admin/AddProduct";
 import React from "react";
 
-const page = () => {
+const addProducts = () => {
   return (
     <section>
       <AddProduct />
@@ -9,4 +9,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default addProducts;
