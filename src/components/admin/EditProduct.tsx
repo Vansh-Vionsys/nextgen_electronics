@@ -31,7 +31,7 @@ const categories = [
   "Cameras & Accessories",
   "Computers & Laptops",
   "Home Appliances",
-] as const;
+];
 
 const EditProduct = ({ product }: { product: Product }) => {
   const [open, setOpen] = useState(false);

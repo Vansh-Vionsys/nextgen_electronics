@@ -2,11 +2,7 @@ import AddProduct from "@/components/admin/AddProduct";
 import React from "react";
 
 const addProducts = () => {
-  return (
-    <section>
-      <AddProduct />
-    </section>
-  );
+  return <AddProduct />;
 };
 
 export default addProducts;

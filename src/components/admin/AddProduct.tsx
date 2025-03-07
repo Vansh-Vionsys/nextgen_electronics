@@ -137,7 +137,7 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-slate-800 py-8 px-4">
+    <div className="min-h-screen bg-gray-100 dark:bg-black py-8 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6">
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">

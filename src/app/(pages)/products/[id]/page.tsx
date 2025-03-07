@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import useGetProductById from "@/features/productMutations/useGetProductById";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import useAddCartProduct from "@/features/cartMutations/useAddCartProduct";
@@ -16,7 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Spinner from "@/components/Spinner";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Star, MessageSquare } from "lucide-react";
+import Image from "next/image";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -26,7 +27,6 @@ const ProductDetails = () => {
 
   const { getProductDetail, getProductDetailsLoading } =
     useGetProductById(productId);
-  // add to cart functionality
   const [quantity, setQuantity] = useState(1);
   const { addCartProduct, isAddingCart } = useAddCartProduct(userId || "");
   const [mainImage, setMainImage] = useState<string | null>(null);
@@ -42,6 +42,12 @@ const ProductDetails = () => {
     const data = { productId, quantity };
     addCartProduct(data);
   };
+
+  const handleAddReview = () => {
+    // Placeholder for review functionality (e.g., open a modal or redirect)
+    alert("Add Review functionality coming soon!");
+  };
+
   useEffect(() => {
     if (getProductDetail?.images?.length > 0) {
       setMainImage(getProductDetail.images[0].url);
@@ -53,7 +59,7 @@ const ProductDetails = () => {
       <div className="container mx-auto py-8 px-4">
         <div className="flex flex-wrap items-start -mx-4">
           <div className="w-full md:w-1/2 px-4 mb-8">
-            <Skeleton className="w-full max-w-[350px] h-64 mx-auto rounded-lg" />
+            <Skeleton className="w-full max-w-[400px] h-72 mx-auto rounded-xl shadow-md" />
             <div className="flex gap-4 py-4 justify-center">
               {[...Array(4)].map((_, index) => (
                 <Skeleton key={index} className="size-20 rounded-md" />
@@ -61,13 +67,13 @@ const ProductDetails = () => {
             </div>
           </div>
           <div className="w-full md:w-1/2 px-4">
-            <Skeleton className="h-8 w-3/4 mb-2" />
+            <Skeleton className="h-10 w-3/4 mb-4 rounded-full" />
             <Skeleton className="h-6 w-1/2 mb-4" />
-            <Skeleton className="h-6 w-1/3 mb-4" />
-            <Skeleton className="h-20 w-full mb-6" />
+            <Skeleton className="h-6 w-1/3 mb-6" />
+            <Skeleton className="h-24 w-full mb-6 rounded-lg" />
             <div className="flex space-x-4">
-              <Skeleton className="h-10 w-32" />
-              <Skeleton className="h-10 w-32" />
+              <Skeleton className="h-12 w-36 rounded-full" />
+              <Skeleton className="h-12 w-36 rounded-full" />
             </div>
           </div>
         </div>
@@ -77,114 +83,159 @@ const ProductDetails = () => {
 
   if (!getProductDetail) {
     return (
-      <p className="text-center text-gray-500 text-lg">No product found</p>
+      <p className="text-center text-gray-500 dark:text-gray-400 text-xl font-medium py-16">
+        No product found
+      </p>
     );
   }
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-200 py-8 px-4 container mx-auto">
-      <div className="flex flex-wrap items-start -mx-4">
+    <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 text-gray-900 dark:text-gray-200">
+      <div className="flex flex-col lg:flex-row items-start gap-8">
         {/* Image Section */}
-        <div className="w-full md:w-1/2 px-4 mb-8">
-          <Card className="bg-slate-800 max-w-[350px] mx-auto">
-            <CardContent className="p-0">
-              <img
-                src={mainImage as string}
-                alt={getProductDetail.name}
-                className="w-full h-64 object-cover rounded-t-lg"
-              />
+        <div className="w-full lg:w-1/2">
+          <Card className="shadow-xl dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden max-w-[400px] mx-auto bg-gradient-to-br from-gray-50 to-gray-200 dark:from-gray-700 dark:to-gray-800">
+            <CardContent className="p-4">
+              <div className="relative w-full max-h-[400px] aspect-auto">
+                <Image
+                  src={mainImage || "https://via.placeholder.com/400"}
+                  alt={getProductDetail.name}
+                  width={400}
+                  height={400}
+                  className="w-full h-auto object-contain rounded-xl hover:scale-105 transition-transform duration-300"
+                  priority
+                />
+              </div>
             </CardContent>
           </Card>
           <div className="flex gap-4 py-4 justify-center overflow-x-auto">
             {getProductDetail.images.map((image: any, index: number) => (
-              <img
+              <div
                 key={index}
-                src={image.url}
-                alt={`Thumbnail ${index + 1}`}
-                className="size-16 sm:size-20 object-cover rounded-md cursor-pointer opacity-60 hover:opacity-100 transition duration-300 border-2 border-transparent hover:border-indigo-500 dark:hover:border-indigo-400"
+                className="relative size-16 sm:size-20 rounded-md overflow-hidden cursor-pointer opacity-70 hover:opacity-100 transition duration-300 border-2 border-transparent hover:border-primary dark:hover:border-indigo-400 shadow-md"
                 onClick={() => setMainImage(image.url)}
-              />
+              >
+                <Image
+                  src={image.url}
+                  alt={`Thumbnail ${index + 1}`}
+                  fill
+                  sizes="80px"
+                  className="object-cover"
+                />
+              </div>
             ))}
           </div>
         </div>
 
         {/* Details Section */}
-        <div className="w-full md:w-1/2 px-4">
-          <h2 className="text-3xl font-bold mb-2">{getProductDetail.name}</h2>
+        <div className="w-full lg:w-1/2">
+          <Card className="shadow-xl dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-transparent">
+              <CardTitle className="text-3xl font-bold text-gray-800 dark:text-white">
+                {getProductDetail.name}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 space-y-6">
+              {/* Rating */}
+              <div className="flex items-center gap-2">
+                <span className="text-yellow-400 flex">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`h-5 w-5 ${
+                        i < Math.round(getProductDetail.ratings)
+                          ? "fill-current"
+                          : "text-gray-300 dark:text-gray-600"
+                      }`}
+                    />
+                  ))}
+                </span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  ({getProductDetail.ratings} / 5)
+                </span>
+              </div>
 
-          {/* Rating with Stars */}
-          <div className="flex items-center mb-2">
-            <span className="text-yellow-400 text-lg">
-              {"⭐".repeat(Math.round(getProductDetail.ratings))}
-            </span>
-            <span className="ml-2 text-gray-400">
-              ({getProductDetail.ratings} / 5)
-            </span>
-          </div>
+              {/* Price */}
+              <div>
+                <span className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  ₹{getProductDetail.price.toFixed(2)}
+                </span>
+              </div>
 
-          {/* Price */}
-          <div className="mb-4">
-            <span className="text-2xl text-green-500 font-bold">
-              ₹{getProductDetail.price}
-            </span>
-          </div>
+              {/* Availability */}
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-gray-700 dark:text-gray-300">
+                  Availability:
+                </span>
+                <Badge
+                  variant="default"
+                  className={`${
+                    getProductDetail.stock > 10
+                      ? "bg-green-500 hover:bg-green-600"
+                      : "bg-red-500 hover:bg-red-600"
+                  } text-white`}
+                >
+                  {getProductDetail.stock > 10
+                    ? `${getProductDetail.stock} left`
+                    : `${getProductDetail.stock} left only`}
+                </Badge>
+              </div>
 
-          {/* Availability */}
-          <div className="mb-4">
-            <span className="font-bold text-gray-600 dark:text-gray-200">
-              Availability:{" "}
-            </span>
-            <Badge
-              variant="default"
-              className={
-                getProductDetail.stock > 10 ? "bg-green-500" : "bg-red-500"
-              }
-            >
-              {getProductDetail.stock > 10
-                ? `${getProductDetail.stock} left`
-                : `${getProductDetail.stock} left only`}
-            </Badge>
-          </div>
+              {/* Description */}
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                {getProductDetail.description}
+              </p>
 
-          {/* Description */}
-          <p className="text-gray-700 dark:text-gray-300 mb-6">
-            {getProductDetail.description}
-          </p>
+              {/* Quantity Selector */}
+              <div className="flex items-center gap-4">
+                <span className="font-semibold text-gray-700 dark:text-gray-300">
+                  Quantity:
+                </span>
+                <Select
+                  value={quantity.toString()}
+                  onValueChange={handleQuantityChange}
+                >
+                  <SelectTrigger className="w-20 h-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-primary">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60 overflow-y-auto bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+                    {Array.from(
+                      { length: Math.min(getProductDetail.stock) },
+                      (_, i) => i + 1
+                    ).map((qty) => (
+                      <SelectItem
+                        key={qty}
+                        value={qty.toString()}
+                        className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        {qty}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-          {/* Quantity Selector */}
-          <div className="mb-6 flex items-center space-x-3">
-            <span className="font-bold text-gray-600 dark:text-gray-200">
-              Qty:{" "}
-            </span>
-            <Select
-              value={quantity.toString()}
-              onValueChange={handleQuantityChange}
-            >
-              <SelectTrigger className="w-16 h-10 border-0 bg-transparent focus:ring-0 text-gray-900 dark:text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="max-h-60 overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-                {Array.from(
-                  { length: Math.min(getProductDetail.stock) },
-                  (_, i) => i + 1
-                ).map((qty) => (
-                  <SelectItem
-                    key={qty}
-                    value={qty.toString()}
-                    className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  >
-                    {qty}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Buttons */}
-          <Button onClick={() => handleSubmit(productId)} className="w-52">
-            <ShoppingCart className="mr-2 h-2 w-5" />
-            {isAddingCart ? <Spinner /> : "Add to cart"}
-          </Button>
+              {/* Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button
+                  onClick={() => handleSubmit(productId)}
+                  className="w-full sm:w-48 rounded-full py-2 "
+                  disabled={isAddingCart}
+                >
+                  <ShoppingCart className="mr-2 h-5 w-5" />
+                  {isAddingCart ? <Spinner /> : "Add to Cart"}
+                </Button>
+                <Button
+                  onClick={handleAddReview}
+                  variant="outline"
+                  className="w-full sm:w-48 border-primary text-primary hover:bg-primary hover:text-white font-semibold rounded-full py-2 transition-colors dark:border-indigo-400 dark:text-indigo-400 dark:hover:bg-indigo-400 dark:hover:text-white"
+                >
+                  <MessageSquare className="mr-2 h-5 w-5" />
+                  Add Review
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

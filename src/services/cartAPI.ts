@@ -1,4 +1,3 @@
-import { ICart } from "@/types/cart.types";
 import axios from "axios";
 
 // add products to cart
@@ -20,9 +19,7 @@ export const getAllCartProductApi = async (userId: string) => {
 
 // delete product from cart by  productId
 export const deleteCartProductApi = async (productId: string) => {
-  const response = await axios.delete(
-    `http://localhost:3000/api/cart?productId=${productId}`
-  );
+  const response = await axios.delete(`/api/cart?productId=${productId}`);
   return response.data;
 };
 

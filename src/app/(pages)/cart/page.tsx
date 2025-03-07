@@ -19,27 +19,21 @@ import { ArrowLeft, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { TbShoppingCartExclamation } from "react-icons/tb";
 import Link from "next/link";
+import CartCheckout from "@/components/user/CartCheckout";
 
 const Cart = () => {
   const { data: session } = useSession();
   const userId = session?.user?.id || null;
   const { getAllCartProduct, getCartLoading } = useGetCartProduct(userId);
   const { updateCartProduct } = useUpdateCartProduct();
-
-  console.log("getAllCartProduct", getAllCartProduct);
-  console.log(getAllCartProduct);
   const { deleteCartProduct, deleteCartProductPending } = useDeleteCartProduct(
     userId || ""
   );
-
   const [cartQuantities, setCartQuantities] = useState<{
     [key: string]: number;
   }>({});
 
   useEffect(() => {
-    if (userId) {
-      // Fetch cart when userId changes
-    }
     if (getAllCartProduct) {
       const initialQuantities = getAllCartProduct.reduce(
         (acc: any, item: any) => {
@@ -67,28 +61,7 @@ const Cart = () => {
       </div>
     );
   }
-
-  if (!getAllCartProduct || getAllCartProduct.length === 0) {
-    return (
-      <div className="container mx-auto py-8 px-4 text-center flex flex-col items-center h-screen">
-        <p className="text-xl text-gray-700 dark:text-gray-200 font-medium pt-24">
-          Your cart is empty
-        </p>
-        <TbShoppingCartExclamation className="h-10 w-20 mt-4" />
-        <Button
-          variant="outline"
-          className="mt-4 group hover:bg-primary hover:text-black transition-colors"
-        >
-          <a href="/products" className="flex items-center">
-            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            Continue Shopping
-          </a>
-        </Button>
-      </div>
-    );
-  }
-
-  const totalItems = getAllCartProduct.length;
+  const totalItems = getAllCartProduct?.length || 0;
 
   const handleQuantityChange = (productId: string, quantity: number) => {
     if (quantity < 1) return;
@@ -101,6 +74,23 @@ const Cart = () => {
       deleteCartProduct(productId);
     }
   };
+
+  if (!getAllCartProduct || getAllCartProduct.length === 0) {
+    return (
+      <div className="container mx-auto py-8 px-4 text-center flex flex-col items-center h-screen">
+        <p className="text-xl text-gray-700 dark:text-gray-200 font-medium pt-24">
+          Your cart is empty
+        </p>
+        <TbShoppingCartExclamation className="h-10 w-20 mt-4" />
+        <Button className="mt-4">
+          <a href="/products" className="flex items-center">
+            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+            Continue Shopping
+          </a>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -155,9 +145,7 @@ const Cart = () => {
                       <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         Qty:
                       </Label>
-                      {/* Unified Quantity Box */}
-                      <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />{" "}
-                      {/* Divider */}
+                      <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
                       <Select
                         value={(
                           cartQuantities[item.product._id] || item.quantity
@@ -208,6 +196,13 @@ const Cart = () => {
               </Button>
             </CardContent>
           </Card>
+        </div>
+        {/* Add CartCheckout Component Here */}
+        <div className="w-full lg:w-1/4">
+          <CartCheckout
+            cartItems={getAllCartProduct}
+            cartQuantities={cartQuantities}
+          />
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="border-b sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <footer className="border-y sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="max-w-screen-lg py-10 px-4 sm:px-6 sm:flex justify-between mx-auto">
         <div className="p-5 sm:w-2/12 border-r border-gray-700">
           <div className="text-sm uppercase text-indigo-400 font-bold">
@@ -80,7 +80,7 @@ const Footer = () => {
             <SlSocialYoutube className="text-xl text-gray-400 hover:text-indigo-400" />
           </a>
         </div>
-        <div className="my-5">© Copyright 2023. All Rights Reserved.</div>
+        <div className="my-5">© Copyright 2025. All Rights Reserved.</div>
       </div>
     </footer>
   );
