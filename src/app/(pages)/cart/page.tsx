@@ -20,6 +20,7 @@ import Image from "next/image";
 import { TbShoppingCartExclamation } from "react-icons/tb";
 import Link from "next/link";
 import CartCheckout from "@/components/user/CartCheckout";
+import { toINR } from "@/helpers/convertToINR";
 
 const Cart = () => {
   const { data: session } = useSession();
@@ -131,15 +132,14 @@ const Cart = () => {
                         {item.product.name}
                       </h3>
                       <span className="text-xl font-bold text-gray-900 dark:text-white">
-                        ₹
-                        {(
+                        {toINR(
                           item.product.price *
-                          (cartQuantities[item.product._id] || item.quantity)
-                        ).toFixed(2)}
+                            (cartQuantities[item.product._id] || item.quantity)
+                        )}
                       </span>
                     </div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Price: ₹{item.product.price.toFixed(2)}
+                      Price: {toINR(item.product.price)}
                     </p>
                     <div className="flex items-center gap-4 flex-wrap">
                       <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">

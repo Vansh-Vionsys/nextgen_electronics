@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import Spinner from "./Spinner";
+import { toINR } from "@/helpers/convertToINR";
 
 const ProductCard = ({ product }: { product: any }) => {
   const { data: session } = useSession();
@@ -97,7 +98,7 @@ const ProductCard = ({ product }: { product: any }) => {
           {product.description}
         </p>
         <div className="flex justify-between items-center">
-          <span className="text-xl">{product.price}</span>
+          <span className="text-xl">{toINR(product.price)}</span>
           <span
             className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-sm font-semibold ${
               product.stock >= 10 ? "text-green-600" : "text-red-600"

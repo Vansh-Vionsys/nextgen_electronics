@@ -1,6 +1,17 @@
 import { IVoucher } from "@/types/voucher.types";
 import axios from "axios";
 
+export const verifyVoucherApi = async (
+  code: FormDataEntryValue | null,
+  subTotal: number
+) => {
+  const response = await axios.post("/api/voucher/verify", {
+    code,
+    subTotal,
+  });
+  return response.data;
+};
+
 export const addVoucherApi = async (data: IVoucher) => {
   const response = await axios.post("/api/voucher", data);
   return response.data;

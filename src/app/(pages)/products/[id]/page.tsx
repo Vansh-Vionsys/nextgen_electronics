@@ -18,6 +18,7 @@ import {
 import Spinner from "@/components/Spinner";
 import { ShoppingCart, Star, MessageSquare } from "lucide-react";
 import Image from "next/image";
+import { toINR } from "@/helpers/convertToINR";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -158,7 +159,7 @@ const ProductDetails = () => {
               {/* Price */}
               <div>
                 <span className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  ₹{getProductDetail.price.toFixed(2)}
+                  {toINR(getProductDetail.price)}
                 </span>
               </div>
 
