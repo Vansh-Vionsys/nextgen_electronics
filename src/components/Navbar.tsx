@@ -18,10 +18,11 @@ import { useLogout } from "@/features/authMutations/useLogin";
 import useGetCartProduct from "@/features/cartMutations/useGetCartProduct";
 import { Badge } from "@/components/ui/badge";
 import { Menu, X } from "lucide-react";
+import { CiSearch } from "react-icons/ci";
 
 const Navbar = () => {
   const { data: session } = useSession();
-  console.log(session);
+  console.log("session: ", session);
   const userId = session?.user?.id;
   const isLogin = !!session?.user;
   const isAdmin = session?.user?.role === "admin";
@@ -77,6 +78,10 @@ const Navbar = () => {
 
           {/* Right Side: Cart, Profile, Theme Toggle, Mobile Menu Toggle */}
           <div className="flex items-center space-x-2 sm:space-x-4">
+            <Link href="/search" className="relative">
+              <CiSearch className="h-5 w-5" />
+            </Link>
+
             {/* Cart */}
             {!isAdmin && (
               <Link href="/cart" className="relative">

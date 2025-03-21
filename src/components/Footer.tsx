@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="border-y sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <footer className="border-y sticky">
       <div className="max-w-screen-lg py-10 px-4 sm:px-6 sm:flex justify-between mx-auto">
         <div className="p-5 sm:w-2/12 border-r border-gray-700">
           <div className="text-sm uppercase text-indigo-400 font-bold">

@@ -173,28 +173,4 @@ const ProductCard = ({ product }: { product: any }) => {
   );
 };
 
-const ProductGrid = () => {
-  const { getAllProducts, getAllProductsLoading } = useGetAllProducts();
-
-  if (getAllProductsLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-4">
-        {[...Array(6)].map((_, index) => (
-          <Skeleton key={index} className="h-72 w-full rounded-xl" />
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex justify-center items-center p-4 min-h-screen">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl w-full">
-        {getAllProducts?.map((product: IProduct, index: number) => (
-          <ProductCard key={product?.id || index} product={product} />
-        ))}
-      </div>
-    </div>
-  );
-};
-
-export default ProductGrid;
+export default ProductCard;
