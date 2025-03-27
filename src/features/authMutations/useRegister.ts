@@ -8,8 +8,9 @@ export const useRegister = () => {
   const { mutate, isPending, isError } = useMutation({
     mutationFn: ({ userName, email, password }: IRegisterUser) =>
       registerApi({ userName, email, password }),
-    onSuccess: () => toast.success("User created successfully"),
-    onError: (err: any) => toast.error(err.response.data.error),
+    onSuccess: () => toast.success("User registered successfully"),
+    onError: (err: any) =>
+      toast.error(err?.response?.data?.error || "Failed to register user"),
   });
   return {
     register: mutate,
@@ -22,14 +23,10 @@ export const useAuthLogin = () => {
   const { mutate, isPending, isError } = useMutation({
     mutationFn: (provider: string) => signIn(provider, { callbackUrl: "/" }),
     onSuccess: () => {
-      toast.success("Login Successful!!");
+      toast.success("Login successful");
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onError: (error: any) => {
-      console.log(error?.response?.data?.error);
-      toast.error(
-        error?.response?.data?.error || "Failed to login. Please try again..."
-      );
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.error || "Failed to login");
     },
   });
   return {

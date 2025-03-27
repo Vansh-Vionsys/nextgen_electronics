@@ -8,9 +8,11 @@ const useDeleteVoucher = () => {
     mutationFn: (id: string) => deleteVoucherApi(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["voucher"] });
-      toast.success("Voucher is deleted");
+      toast.success("Voucher deleted successfully");
     },
-    onError: (err: any) => toast.error(err.response.data.error),
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.error || "Failed to delete voucher");
+    },
   });
   return {
     deleteVoucher: mutate,

@@ -76,14 +76,11 @@ const ProductCard = ({ product }: { product: any }) => {
       <div className="relative h-48 flex-shrink-0">
         <Image
           width={500}
-          height={200}
+          height={300}
           src={product.images[0]?.url}
           alt={product.name}
-          className="object-cover w-full h-full"
+          className="w-[90%] h-full mx-auto rounded-lg mt-3"
         />
-        <Badge className="absolute top-2 right-4 bg-gray-200 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-800 text-gray-900 dark:text-white rounded-full py-1 px-2">
-          {product.category}
-        </Badge>
       </div>
 
       <CardContent className="p-4 space-y-2 flex-grow">
@@ -140,8 +137,13 @@ const ProductCard = ({ product }: { product: any }) => {
             className="flex-1 "
             disabled={isAddingCart}
           >
-            <ShoppingCart className="mr-2 h-2 w-5" />
-            {isAddingCart ? <Spinner /> : "Add to cart"}
+            {isAddingCart ? (
+              <Spinner />
+            ) : (
+              <>
+                <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
+              </>
+            )}
           </Button>
         </div>
       )}

@@ -15,6 +15,9 @@ const useUpdateVoucher = () => {
         queryKey: ["voucher"],
       });
     },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.error || "Failed to update voucher");
+    },
   });
   return {
     updateVoucher: mutate,

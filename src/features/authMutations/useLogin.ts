@@ -31,9 +31,10 @@ export const useLogin = () => {
       toast.success("User login successful");
       router.push("/");
     },
-
-    onError: (error) => {
-      toast.error(error.message || "Error occurred while logging in");
+    onError: (err: any) => {
+      toast.error(
+        err?.response?.data?.error || "Failed to login. Please try again..."
+      );
     },
   });
 
@@ -47,13 +48,11 @@ export const useLogout = () => {
   const { mutate, isPending, isError } = useMutation({
     mutationFn: () => signOut(),
     onSuccess: () => {
-      toast.success("Logged Out Successfully!!");
+      toast.success("Logged out successfully");
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onError: (error: any) => {
-      console.log(error?.response?.data?.error);
+    onError: (err: any) => {
       toast.error(
-        error?.response?.data?.error || "Failed to logout. Please try again..."
+        err?.response?.data?.error || "Failed to logout. Please try again..."
       );
     },
   });

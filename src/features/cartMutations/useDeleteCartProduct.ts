@@ -15,8 +15,10 @@ const useDeleteCartProduct = (userId: string) => {
         exact: true,
       });
     },
-    onError: (error: any) => {
-      toast.error("Error while removing product", error);
+    onError: (err: any) => {
+      toast.error(
+        err?.response?.data?.error || "Failed to remove product from cart"
+      );
     },
   });
   return {

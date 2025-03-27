@@ -8,13 +8,13 @@ const useAddVoucher = () => {
   const { mutate, isPending, error } = useMutation({
     mutationFn: (data: IVoucher) => addVoucherApi(data),
     onSuccess: () => {
-      toast.success("Voucher Code Added Successfully");
+      toast.success("Voucher added successfully");
       queryClient.invalidateQueries({
         queryKey: ["voucher"],
       });
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.error);
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.error || "Failed to add voucher");
     },
   });
   return {

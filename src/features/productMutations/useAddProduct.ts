@@ -8,14 +8,13 @@ const useAddProduct = () => {
   const { mutate, isPending, error } = useMutation({
     mutationFn: (value: any) => addProductAPI(value),
     onSuccess: () => {
-      toast.success("Product added Successfully");
+      toast.success("Product added successfully");
       queryClient.invalidateQueries({
         queryKey: ["products"],
       });
     },
-
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.error);
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.error || "Failed to add product");
     },
   });
 

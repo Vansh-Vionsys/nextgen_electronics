@@ -58,7 +58,7 @@ const Navbar = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <span className="md:text-lg font-bold bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent">
+            <span className="md:text-lg font-bold dark:bg-white bg-black bg-clip-text text-transparent">
               NextGenElectronics
             </span>
           </Link>

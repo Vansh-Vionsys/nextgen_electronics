@@ -7,14 +7,15 @@ const useAddCartProduct = (userId: string) => {
   const { mutate, isPending, error } = useMutation({
     mutationFn: (data: any) => addCartProductApi({ userId, data }),
     onSuccess: () => {
-      toast.success("Product Added to Cart");
+      toast.success("Product added to cart");
       queryClient.invalidateQueries({
         queryKey: ["cart", userId],
       });
     },
-
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.error);
+    onError: (err: any) => {
+      toast.error(
+        err?.response?.data?.error || "Failed to add product to cart"
+      );
     },
   });
   return {

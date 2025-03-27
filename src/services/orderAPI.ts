@@ -1,39 +1,35 @@
 import axios from "axios";
-import { Address } from "@/components/user/CartCheckout";
+import { DeliveryStatus, IOrder, OrderResponse } from "@/types/order.types";
 
-interface OrderPayload {
-  items: { product: string; quantity: number }[];
-  totalAmount: number;
-  address: Address;
-  voucherAmount?: number;
-  voucherId?: string;
-}
-
-interface OrderResponse {
-  orderId: string;
-  amount: number;
-  currency: string;
-  dbOrderId: string;
-}
-
-interface OrderStatusResponse {
-  paymentStatus: string;
-  deliveryStatus: string;
-  // Add other fields as needed
-}
-
-export const createOrder = async (
-  payload: OrderPayload
-): Promise<OrderResponse> => {
+// create orders
+export const createOrder = async (payload: IOrder): Promise<OrderResponse> => {
   const response = await axios.post<OrderResponse>("/api/orders", payload);
   return response.data;
 };
 
-export const fetchOrderStatus = async (
-  dbOrderId: string
-): Promise<OrderStatusResponse> => {
-  const response = await axios.get<OrderStatusResponse>(
-    `/api/orders?orderId=${dbOrderId}`
+// ✅ Fetch all orders (Admin)
+export const getAllOrders = async (): Promise<IOrder[]> => {
+  const response = await axios.get<{ success: boolean; orders: IOrder[] }>(
+    "/api/orders/admin"
   );
+  return response.data.orders;
+};
+
+// ✅ Fetch orders for the logged-in user
+export const getUserOrders = async (): Promise<IOrder[]> => {
+  const response = await axios.get<{ success: boolean; orders: IOrder[] }>(
+    "/api/orders/user"
+  );
+  return response.data.orders;
+};
+
+export const updateOrderById = async (
+  orderId: string,
+  deliveryStatus: DeliveryStatus
+): Promise<IOrder> => {
+  const response = await axios.patch<IOrder>(`/api/orders/admin`, {
+    id: orderId,
+    deliveryStatus,
+  });
   return response.data;
 };

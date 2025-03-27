@@ -46,6 +46,24 @@ export const successEmailTemplate = (order: any) => `
         border-radius: 5px;
         font-weight: bold;
       }
+      .order-details {
+        background-color: #f1f1f1;
+        padding: 15px;
+        border-radius: 5px;
+        margin-top: 10px;
+      }
+      .order-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .order-item img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        margin-right: 15px;
+        border-radius: 5px;
+      }
     </style>
   </head>
   <body>
@@ -54,17 +72,44 @@ export const successEmailTemplate = (order: any) => `
         <h1>Payment Successful!</h1>
       </div>
       <div class="content">
-        <p>Hi ${order.user},</p>
-        <p>Thank you for your purchase from <b>NextGenElectronics</b>. We are excited to deliver your Order!</p>
-        <p><b>Order Name: </b>${order.items}</p>
-        <p><b>Order Date: </b>${formatDate(order.createdAt)}</p>
-        <p><b>Order ID: </b>#${order?._id?.toString().slice(-6)}</p>
-        <p><b>Transaction Amount: </b>${order.totalAmount}</p>
-        <a class="btn" href=${process.env.FRONT_URL!}>go to account</a>
+        <p>Hi <b>${order.address.name}</b>,</p>
+        <p>Thank you for your purchase from <b>NextGenElectronics</b>. Your order is now being processed.</p>
+        
+        <div class="order-details">
+          <p><b>Order ID:</b> #${order._id.toString().slice(-6)}</p>
+          <p><b>Order Date:</b> ${formatDate(order.createdAt)}</p>
+          <p><b>Payment Status:</b> ${order.paymentStatus.toUpperCase()}</p>
+          <p><b>Delivery Status:</b> ${order.deliveryStatus.toUpperCase()}</p>
+          <p><b>Transaction Amount:</b> ₹${order.totalAmount}</p>
+        </div>
+
+        <h3>Order Summary:</h3>
+        ${order.items
+          .map(
+            (item: any) => `
+          <div class="order-item">
+            <img src="${item.productImage[0]}" alt="${item.productName}" />
+            <div>
+              <p><b>${item.productName}</b></p>
+              <p>Quantity: ${item.quantity}</p>
+              <p>Price: ₹${item.price}</p>
+            </div>
+          </div>
+        `
+          )
+          .join("")}
+
+        <h3>Shipping Address:</h3>
+        <p>${order.address.name}</p>
+        <p>${order.address.addressLine}, ${order.address.city}</p>
+        <p>ZIP Code: ${order.address.zipCode}</p>
+        <p>Phone: ${order.address.phone}</p>
+
+        <a class="btn" href="${process.env.FRONT_URL}/orders">View Order</a>
       </div>
       <div class="footer">
         <p>If you have any questions, feel free to contact our support team.</p>
-        <p>Thank you for choosing LightRoom!</p>
+        <p>Thank you for choosing NextGenElectronics!</p>
       </div>
     </div>
   </body>
@@ -117,6 +162,24 @@ export const failedEmailTemplate = (order: any) => `
         border-radius: 5px;
         font-weight: bold;
       }
+      .order-details {
+        background-color: #f1f1f1;
+        padding: 15px;
+        border-radius: 5px;
+        margin-top: 10px;
+      }
+      .order-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .order-item img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        margin-right: 15px;
+        border-radius: 5px;
+      }
     </style>
   </head>
   <body>
@@ -125,18 +188,42 @@ export const failedEmailTemplate = (order: any) => `
         <h1>Payment Failed</h1>
       </div>
       <div class="content">
-       <p>Hi ${order.user},</p>
-        <p>We regret to inform you that your recent payment attempt on <b>LightRoom</b> was unsuccessful.</p>
-        <p><b>Order Name: </b>${order.items}</p>
-          <p><b>Order Date: </b>${formatDate(order.createdAt)}</p>
-        <p><b>Order ID: </b>#${order?._id?.toString().slice(-6)}</p>
-        <p><b>Transaction Amount: </b>${order.totalAmount}</p>
-        <p>Please check your payment details and try again. If the issue persists, feel free to contact our support team for assistance.</p>
-        <a class="btn" href=${process.env.FRONT_URL!}>Retry Payment</a>
+        <p>Hi <b>${order.address.name}</b>,</p>
+        <p>We regret to inform you that your payment for the following order was **unsuccessful**.</p>
+        
+        <div class="order-details">
+          <p><b>Order ID:</b> #${order._id.toString().slice(-6)}</p>
+          <p><b>Order Date:</b> ${formatDate(order.createdAt)}</p>
+          <p><b>Transaction Amount:</b> ₹${order.totalAmount}</p>
+          <p><b>Payment Status:</b> Failed ❌</p>
+        </div>
+
+        <h3>Order Summary:</h3>
+        ${order.items
+          .map(
+            (item: any) => `
+          <div class="order-item">
+            <img src="${item.productImage[0]}" alt="${item.productName}" />
+            <div>
+              <p><b>${item.productName}</b></p>
+              <p>Quantity: ${item.quantity}</p>
+              <p>Price: ₹${item.price}</p>
+            </div>
+          </div>
+        `
+          )
+          .join("")}
+
+        <p>Please try again or use a different payment method.</p>
+        <p>If the amount was deducted from your account but the payment failed, it will be refunded automatically within **5-7 business days**.</p>
+
+        <a class="btn" href="${
+          process.env.FRONT_URL
+        }/checkout">Retry Payment</a>
       </div>
       <div class="footer">
-        <p>Thank you for choosing LightRoom!</p>
-        <p>If you need help, contact us at <a href="mailto:support@lighteroom.com">support@lighteroom.com</a>.</p>
+        <p>If you need assistance, contact our support team at <a href="mailto:support@nextgenelectronics.com">support@nextgenelectronics.com</a>.</p>
+        <p>Thank you for shopping with NextGenElectronics!</p>
       </div>
     </div>
   </body>

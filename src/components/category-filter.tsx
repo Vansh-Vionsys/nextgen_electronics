@@ -60,31 +60,34 @@ export function CategoryFilter({ onCategorySelect }: CategoryFilterProps) {
   };
 
   return (
-    <div>
-      <div className="flex flex-wrap justify-center gap-8 md:gap-16 mb-12">
+    <div className="px-4 sm:px-6 lg:px-4">
+      <div className="flex flex-wrap justify-center gap-4 sm:gap-8 md:gap-16 lg:gap-12 mb-8 sm:mb-10 md:mb-12">
         {categories.map((category) => (
           <div
             key={category.id}
-            className="flex flex-col items-center cursor-pointer"
+            className="flex flex-col items-center cursor-pointer w-[80px] sm:w-[100px] md:w-[180px]"
             onClick={() => handleCategoryClick(category.id)}
           >
             <div
               className={cn(
-                "w-28 h-28 md:w-36 md:h-36 rounded-full flex items-center justify-center overflow-hidden",
+                "w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-36 lg:h-36 rounded-full flex items-center justify-center overflow-hidden",
                 "bg-gradient-to-br from-purple-600 to-blue-400",
                 "transition-transform hover:scale-105",
-                selectedCategory === category.id ? "ring-4 ring-white" : ""
+                selectedCategory === category.id
+                  ? "ring-2 sm:ring-3 md:ring-4 ring-white"
+                  : ""
               )}
             >
               <Image
                 src={category.image || "/placeholder.svg"}
                 alt={category.name}
-                width={144} // Increase width for better responsiveness
-                height={144} // Increase height for better responsiveness
+                width={144}
+                height={144}
                 className="rounded-full object-cover w-full h-full"
+                sizes="(max-width: 640px) 80px, (max-width: 768px) 96px, (max-width: 1024px) 112px, 144px"
               />
             </div>
-            <p className="mt-3 text-center font-medium text-gray-800 dark:text-gray-200">
+            <p className="mt-2 sm:mt-3 text-center  text-gray-800 dark:text-gray-200">
               {category.label}
             </p>
           </div>

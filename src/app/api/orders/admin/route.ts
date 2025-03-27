@@ -1,15 +1,13 @@
 import { authOptions } from "@/lib/auth";
 import dbConnect from "@/lib/dbConnect";
+import orderModel from "@/models/order.model";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import Order from "@/models/order.model";
-import mongoose from "mongoose"; // Import mongoose to handle ObjectId
 
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-
-    if (!session || !session.user) {
+    if (!session || session.user?.role !== "admin") {
       return NextResponse.json(
         { error: "Unauthorized Access" },
         { status: 401 }
@@ -18,14 +16,16 @@ export async function GET(req: NextRequest) {
 
     await dbConnect();
 
-    const userId = new mongoose.Types.ObjectId(session.user.id);
-
-    console.log("User ID for Query:", userId);
-
-    const userOrders = await Order.aggregate([
+    const orders = await orderModel.aggregate([
       {
-        $match: { user: userId },
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "userDetails",
+        },
       },
+      { $unwind: "$userDetails" },
       {
         $lookup: {
           from: "products",
@@ -37,6 +37,7 @@ export async function GET(req: NextRequest) {
       {
         $project: {
           _id: 1,
+          userName: "$userDetails.userName",
           totalAmount: 1,
           paymentStatus: 1,
           address: 1,
@@ -80,21 +81,61 @@ export async function GET(req: NextRequest) {
       },
     ]);
 
-    if (!userOrders.length) {
+    return NextResponse.json({ success: true, orders }, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    return NextResponse.json(
+      { success: false, message: "Failed to fetch orders" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    // Ensure user is authenticated and an admin
+    const session = await getServerSession(authOptions);
+    if (!session || session.user?.role !== "admin") {
       return NextResponse.json(
-        { message: "No orders found for this user" },
-        { status: 404 }
+        { error: "Unauthorized Access" },
+        { status: 401 }
       );
     }
 
+    await dbConnect();
+
+    const body = await req.json();
+    const { id, deliveryStatus } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Order ID is required" },
+        { status: 400 }
+      );
+    }
+
+    // Update order details
+    const updatedOrder = await orderModel.findByIdAndUpdate(
+      id,
+      { deliveryStatus },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedOrder) {
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
     return NextResponse.json(
-      { success: true, orders: userOrders },
+      { message: "Order updated successfully", order: updatedOrder },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error fetching user orders:", error);
+    console.error("Error updating order:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error: "Server Error",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 }
     );
   }

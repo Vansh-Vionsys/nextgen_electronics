@@ -11,9 +11,10 @@ export const addCartProductApi = async ({
   const response = await axios.post(`/api/cart?userId=${userId}`, data);
   return response.data;
 };
+
 // get all cart product
 export const getAllCartProductApi = async (userId: string) => {
-  const response = await axios.get(`api/cart?userId=${userId}`);
+  const response = await axios.get(`/api/cart?userId=${userId}`);
   return response.data;
 };
 

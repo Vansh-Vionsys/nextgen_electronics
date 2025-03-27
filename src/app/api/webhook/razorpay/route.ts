@@ -22,9 +22,6 @@ export async function POST(req: NextRequest) {
       .update(body)
       .digest("hex");
 
-    console.log("expectedSignature", expectedSignature);
-    console.log("Signature", signature);
-
     if (expectedSignature !== signature) {
       return NextResponse.json({ error: "Invalid Signature" }, { status: 400 });
     }
@@ -40,75 +37,157 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-
-    // Connect to the database
     await dbConnect();
+
+    const payment = event.payload.payment.entity;
+
+    // Common function to fetch detailed order info
+    async function getDetailedOrder(orderId: string) {
+      const orderDetails = await Order.aggregate([
+        { $match: { razorpayOrderId: orderId } },
+        {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "userDetails",
+          },
+        },
+        { $unwind: "$userDetails" },
+        {
+          $lookup: {
+            from: "products",
+            localField: "items.product",
+            foreignField: "_id",
+            as: "productDetails",
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            userEmail: "$userDetails.email",
+            totalAmount: 1,
+            paymentStatus: 1,
+            address: 1,
+            deliveryStatus: 1,
+            createdAt: 1,
+            items: {
+              $map: {
+                input: "$items",
+                as: "item",
+                in: {
+                  productId: "$$item.product",
+                  quantity: "$$item.quantity",
+                  productName: {
+                    $arrayElemAt: [
+                      "$productDetails.name",
+                      {
+                        $indexOfArray: [
+                          "$productDetails._id",
+                          "$$item.product",
+                        ],
+                      },
+                    ],
+                  },
+                  productImage: {
+                    $arrayElemAt: [
+                      "$productDetails.images.url",
+                      {
+                        $indexOfArray: [
+                          "$productDetails._id",
+                          "$$item.product",
+                        ],
+                      },
+                    ],
+                  },
+                  price: {
+                    $arrayElemAt: [
+                      "$productDetails.price",
+                      {
+                        $indexOfArray: [
+                          "$productDetails._id",
+                          "$$item.product",
+                        ],
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          },
+        },
+      ]);
+      return orderDetails.length ? orderDetails[0] : null;
+    }
 
     // Handle payment captured
     if (event.event === "payment.captured") {
-      const payment = event.payload.payment.entity;
-      console.log(payment);
-      // Update order status and fetch order details
       const order = await Order.findOneAndUpdate(
         { razorpayOrderId: payment.order_id },
-        { paymentStatus: "completed" }, // Use "completed" as per your schema
+        { paymentStatus: "completed" },
         { new: true }
-      ).populate([
-        { path: "items.product", select: "name" }, // Ensure Product model has 'name' field
-        { path: "user", select: "email" }, // Use "user" instead of "userId"
-      ]);
+      );
 
-      // Check if order exists
       if (!order) {
         return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      }
+
+      const detailedOrder = await getDetailedOrder(payment.order_id);
+      if (!detailedOrder) {
+        return NextResponse.json(
+          { error: "Order details not found" },
+          { status: 404 }
+        );
       }
 
       // Send success email
       try {
         await sendMail({
-          to: order.user.email, // Access email from populated user
+          to: detailedOrder.userEmail,
           subject: "Your Payment Was Successful! 🎉",
-          html: successEmailTemplate(order),
+          html: successEmailTemplate(detailedOrder),
         });
       } catch (emailError) {
         console.error("Failed to send success email:", emailError);
-        // Optionally log this to a monitoring system, but don't fail the webhook
       }
     }
 
     // Handle payment failed
     if (event.event === "payment.failed") {
-      const payment = event.payload.payment.entity;
-      console.log("failed payment", payment);
-      // Update order status and fetch order details
+      console.log("Payment failed:", payment);
+
       const order = await Order.findOneAndUpdate(
         { razorpayOrderId: payment.order_id },
         { paymentStatus: "failed" },
         { new: true }
-      ).populate([
-        { path: "items.product", select: "name" },
-        { path: "user", select: "email" },
-      ]);
+      );
 
-      // Check if order exists
       if (!order) {
         return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      }
+
+      const detailedOrder = await getDetailedOrder(payment.order_id);
+
+      if (!detailedOrder) {
+        return NextResponse.json(
+          { error: "Order details not found" },
+          { status: 404 }
+        );
       }
 
       // Send failure email
       try {
         await sendMail({
-          to: order.user.email,
+          to: detailedOrder.userEmail,
           subject: "Your Payment Failed! 😢",
-          html: failedEmailTemplate(order),
+          html: failedEmailTemplate(detailedOrder),
         });
       } catch (emailError) {
         console.error("Failed to send failure email:", emailError);
-        // Optionally log this to a monitoring system, but don't fail the webhook
       }
     }
 
-    // Return success for handled events or ignored events
+    // Return success response
     return NextResponse.json({ message: "ok" }, { status: 200 });
   } catch (error) {
     console.error("Webhook Error:", error);

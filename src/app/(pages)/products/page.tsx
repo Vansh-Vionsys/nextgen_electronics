@@ -28,20 +28,25 @@ const Product = ({ selectedCategory }: ProductProps) => {
   }
 
   return (
-    <div className="flex justify-center items-center p-4 min-h-screen">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl w-full">
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product: IProduct, index: number) => (
-            <ProductCard key={product?.id || index} product={product} />
-          ))
-        ) : (
-          <div className="col-span-full text-center py-10">
-            <p className="text-gray-500">
-              No products found
-              {selectedCategory ? ` in ${selectedCategory} category` : ""}
-            </p>
-          </div>
-        )}
+    <div className="container mx-auto py-4 px-6 ">
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+        Products List
+      </h1>
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 max-w-7xl w-full">
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map((product: IProduct, index: number) => (
+              <ProductCard key={product?.id || index} product={product} />
+            ))
+          ) : (
+            <div className="col-span-full text-center py-10">
+              <p className="text-gray-500">
+                No products found
+                {selectedCategory ? ` in ${selectedCategory} category` : ""}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
