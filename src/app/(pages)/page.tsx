@@ -3,15 +3,21 @@ import { Card } from "@/components/ui/card";
 import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
 import { SplineScene } from "@/components/ui/splite";
 import { Spotlight } from "@/components/ui/spotlight";
+import { Modal } from "@/components/ui/modal";
 import { Bot, ChevronDown } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { CategoryFilter } from "@/components/category-filter";
 import Products from "./products/page";
+import AIModel from "@/components/user/AIModel";
+import { useSession } from "next-auth/react";
 
 const Home = () => {
+  const { data: session } = useSession();
+
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
+  const [AIModal, setAIModal] = useState<boolean>(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,7 +33,7 @@ const Home = () => {
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
       <Card className="w-full h-[500px] bg-black/[0.96] relative overflow-hidden">
-        {/* <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" />  */}
+        <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" />
         <div className="flex h-full relative">
           {/* Left content */}
           <div className="flex-1 p-8 z-10 flex flex-col justify-center">
@@ -39,27 +45,27 @@ const Home = () => {
               premium electronic devices and accessories
             </p>
 
-            <div className="pt-4">
-              <HoverBorderGradient
-                onClick={() =>
-                  alert("AI Assistant feature is not available right now")
-                }
-                containerClassName="rounded-full"
-                as="button"
-                className="dark:bg-black bg-white text-black dark:text-white flex items-center space-x-2"
-              >
-                <Bot size={20} />
-                <span>Ask AI Assistant</span>
-              </HoverBorderGradient>
-            </div>
+            {session?.user && (
+              <div className="pt-4">
+                <HoverBorderGradient
+                  onClick={() => setAIModal(!AIModal)}
+                  containerClassName="rounded-full"
+                  as="button"
+                  className="dark:bg-black bg-white text-black dark:text-white flex items-center space-x-2"
+                >
+                  <Bot size={20} />
+                  <span>Ask AI Assistant</span>
+                </HoverBorderGradient>
+              </div>
+            )}
           </div>
 
           {/* Right content */}
           <div className="flex-1 relative">
-            {/*  <SplineScene
+            <SplineScene
               scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
               className="w-full h-full"
-            /> */}
+            />
           </div>
 
           {/* Browse Products Button */}
@@ -82,7 +88,7 @@ const Home = () => {
 
       {/* Products Section */}
       <motion.section
-        className="w-full max-w-7xl  py-20 px-6 rounded-t-3xl relative z-10 shadow-lg bg-white text-gray-900 dark:bg-black dark:text-white"
+        className="w-full max-w-7xl py-20 px-6 rounded-t-3xl relative z-10 shadow-lg bg-white text-gray-900 dark:bg-black dark:text-white"
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
@@ -94,6 +100,17 @@ const Home = () => {
         />
         <Products selectedCategory={selectedCategory} />
       </motion.section>
+
+      {/* AI Assistant Modal */}
+      <Modal
+        open={AIModal}
+        onCancel={() => setAIModal(false)}
+        className="bg-black text-white"
+      >
+        <div className="space-y-4">
+          <AIModel />
+        </div>
+      </Modal>
     </div>
   );
 };
