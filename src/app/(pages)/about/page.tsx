@@ -6,7 +6,7 @@ const page = () => {
   return (
     <div className="h-screen">
       <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-8">
-        <IconCloudDemo />
+        {/*  <IconCloudDemo />  */}
         <div className="max-w-lg">
           <h2 className="text-3xl font-extrabold text-gray-900 dark:text-gray-200 sm:text-4xl">
             About Us

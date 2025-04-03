@@ -1,17 +1,24 @@
 "use client";
 import { useState } from "react";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Trash2 } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import Image from "next/image";
-import useGetAllProducts from "@/features/productMutations/useGetAllProducts";
-import { IProduct } from "@/types/product.types";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import useDeleteProductById from "@/features/productMutations/useDeleteProductById";
 import EditProduct from "./admin/EditProduct";
-import { Skeleton } from "./ui/skeleton";
 import useAddCartProduct from "@/features/cartMutations/useAddCartProduct";
 import {
   Select,
@@ -28,6 +35,7 @@ const ProductCard = ({ product }: { product: any }) => {
   const isAdmin = session?.user?.role === "admin";
   const userId = session?.user?.id;
   const [quantity, setQuantity] = useState(1);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { addCartProduct, isAddingCart } = useAddCartProduct(userId || "");
   const { deleteProduct, isDeletePending } = useDeleteProductById();
 
@@ -36,10 +44,9 @@ const ProductCard = ({ product }: { product: any }) => {
     addCartProduct(data);
   };
 
-  const handleDeleteProduct = (id: string) => {
-    if (confirm("Are you sure you want to delete this product?")) {
-      deleteProduct(id);
-    }
+  const handleDeleteConfirm = () => {
+    deleteProduct(product._id);
+    setIsDeleteDialogOpen(false);
   };
 
   const handleQuantityChange = (value: string) => {
@@ -72,14 +79,14 @@ const ProductCard = ({ product }: { product: any }) => {
   };
 
   return (
-    <Card className="w-full bg-white text-gray-900 dark:text-white dark:border-[1px] overflow-hidden h-[480px] flex flex-col shadow-xl dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl">
-      <div className="relative h-48 flex-shrink-0">
+    <Card className="w-full h-full bg-white text-gray-900 dark:text-white dark:border-[1px] overflow-hidden flex flex-col shadow-xl dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl">
+      <div className="relative h-52 flex-shrink-0">
         <Image
           width={500}
           height={300}
-          src={product.images[0]?.url}
+          src={product.images[0]?.url || "/placeholder-image.jpg"} // Added fallback
           alt={product.name}
-          className="w-[90%] h-full mx-auto rounded-lg mt-3"
+          className="w-full h-full object-cover" // Added object-cover for better image display
         />
       </div>
 
@@ -117,9 +124,9 @@ const ProductCard = ({ product }: { product: any }) => {
             <SelectTrigger className="w-16 h-9 border-2 bg-transparent focus:ring-0 text-gray-900 dark:text-white">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="max-h-60 overflow-y-auto bg-white dark:bg-gray-800 border border-white dark:border-black rounded-lg ">
+            <SelectContent className="max-h-60 overflow-y-auto bg-white dark:bg-gray-800 border border-white dark:border-black rounded-lg">
               {Array.from(
-                { length: Math.min(product.stock) },
+                { length: Math.min(product.stock, 10) }, // Added max limit of 10
                 (_, i) => i + 1
               ).map((qty) => (
                 <SelectItem
@@ -134,8 +141,8 @@ const ProductCard = ({ product }: { product: any }) => {
           </Select>
           <Button
             onClick={() => handleSubmit(product._id)}
-            className="flex-1 "
-            disabled={isAddingCart}
+            className="flex-1"
+            disabled={isAddingCart || product.stock === 0} // Added stock check
           >
             {isAddingCart ? (
               <Spinner />
@@ -150,14 +157,46 @@ const ProductCard = ({ product }: { product: any }) => {
 
       {isAdmin ? (
         <CardFooter className="p-0 flex-shrink-0">
-          <Button
-            onClick={() => handleDeleteProduct(product._id)}
-            variant="ghost"
-            className="w-full hover:underline hover:text-red-700 text-red-700 hover:bg-gray-100 dark:hover:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 rounded-none h-10"
-            disabled={isDeletePending}
+          <AlertDialog
+            open={isDeleteDialogOpen}
+            onOpenChange={setIsDeleteDialogOpen}
           >
-            {isDeletePending ? <Spinner /> : "Delete"}
-          </Button>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="ghost"
+                className="w-full hover:underline hover:text-red-700 text-red-700 hover:bg-gray-100 dark:hover:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 rounded-none h-10"
+                disabled={isDeletePending}
+              >
+                {isDeletePending ? (
+                  <Spinner />
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4" />
+                    Delete
+                  </>
+                )}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Product</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to delete "{product.name}"? This action
+                  cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDeleteConfirm}
+                  className="bg-red-600 hover:bg-red-700"
+                  disabled={isDeletePending}
+                >
+                  {isDeletePending ? <Spinner /> : "Delete"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardFooter>
       ) : (
         <Link href={`/products/${product._id}`}>

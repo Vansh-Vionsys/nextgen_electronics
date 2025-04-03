@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Truck } from "lucide-react";
-import { DeliveryStatus } from "@/types/order.types";
+import { DeliveryStatus, IOrder } from "@/types/order.types";
 
 const AllOrders = () => {
   const { allOrders, getOrdersLoading } = useGetAllOrder();
@@ -33,6 +33,15 @@ const AllOrders = () => {
       </div>
     );
   }
+  // sort allOrders by createdAt in descending order (latest first)
+
+  const sortedOrders = allOrders
+    ? [...allOrders].sort((a: IOrder, b: IOrder) => {
+        const dateA = new Date(a.createdAt || "").getTime();
+        const dateB = new Date(b.createdAt || "").getTime();
+        return dateB - dateA;
+      })
+    : [];
 
   return (
     <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -48,7 +57,7 @@ const AllOrders = () => {
         </Card>
       ) : (
         <div className="space-y-6">
-          {allOrders.map((order: any) => (
+          {sortedOrders.map((order: any) => (
             <Card
               key={order._id}
               className="shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden dark:bg-gray-900"

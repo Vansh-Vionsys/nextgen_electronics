@@ -33,7 +33,7 @@ const Home = () => {
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
       <Card className="w-full h-[500px] bg-black/[0.96] relative overflow-hidden">
-        <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" />
+        {/*   <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" />  */}
         <div className="flex h-full relative">
           {/* Left content */}
           <div className="flex-1 p-8 z-10 flex flex-col justify-center">
@@ -62,13 +62,11 @@ const Home = () => {
 
           {/* Right content */}
           <div className="flex-1 relative">
-            <SplineScene
+            {/* <SplineScene
               scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
               className="w-full h-full"
-            />
+            /> */}
           </div>
-
-          {/* Browse Products Button */}
           <div className="absolute bottom-8 left-0 right-0 text-center z-20">
             <button
               className="text-white flex flex-col items-center gap-2 mx-auto hover:transform hover:translate-y-1 transition-transform duration-300 bg-transparent border-none cursor-pointer"
@@ -87,19 +85,14 @@ const Home = () => {
       </Card>
 
       {/* Products Section */}
-      <motion.section
-        className="w-full max-w-7xl py-20 px-6 rounded-t-3xl relative z-10 shadow-lg bg-white text-gray-900 dark:bg-black dark:text-white"
-        initial={{ y: 50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
-      >
+      <div className="py-20 px-6 rounded-t-3xl relative z-10 shadow-lg bg-white text-gray-900 dark:bg-black dark:text-white">
         <CategoryFilter
           onCategorySelect={(category) => {
             setSelectedCategory(category);
           }}
         />
         <Products selectedCategory={selectedCategory} />
-      </motion.section>
+      </div>
 
       {/* AI Assistant Modal */}
       <Modal

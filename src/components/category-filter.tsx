@@ -74,7 +74,7 @@ export function CategoryFilter({ onCategorySelect }: CategoryFilterProps) {
                 "bg-gradient-to-br from-purple-600 to-blue-400",
                 "transition-transform hover:scale-105",
                 selectedCategory === category.id
-                  ? "ring-2 sm:ring-3 md:ring-4 ring-white"
+                  ? "ring-2 sm:ring-3 md:ring-4 dark:ring-white ring-black"
                   : ""
               )}
             >

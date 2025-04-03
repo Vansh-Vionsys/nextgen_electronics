@@ -55,7 +55,7 @@ const VoucherSection = ({
               <button
                 type="button"
                 onClick={handleRemoveVoucher}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400"
+                className="absolute right-2 top-5 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400"
               >
                 <X className="w-5 h-5" />
               </button>

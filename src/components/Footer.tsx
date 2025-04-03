@@ -7,9 +7,9 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="border-y border-gray-700 dark:border-gray-400 sticky">
+    <footer className="border-y border-gray-700 sticky">
       <div className="max-w-screen-lg py-10 px-4 sm:px-6 sm:flex justify-between mx-auto">
-        <div className="p-5 sm:w-2/12 border-r border-gray-700 dark:border-gray-400">
+        <div className="p-5 sm:w-2/12 border-r border-gray-700">
           <div className="text-sm uppercase text-black dark:text-white font-bold">
             Menu
           </div>
@@ -40,7 +40,7 @@ const Footer = () => {
             </li>
           </ul>
         </div>
-        <div className="p-5 sm:w-7/12 border-r border-gray-700 dark:border-gray-400 text-center">
+        <div className="p-5 sm:w-7/12 border-r border-gray-700 text-center">
           <h3 className="font-bold text-xl text-black dark:text-white mb-4">
             Componential
           </h3>
@@ -68,20 +68,20 @@ const Footer = () => {
           </ul>
         </div>
       </div>
-      <div className="flex py-5 m-auto text-gray-700 dark:text-gray-300 text-sm flex-col items-center border-t border-gray-700 dark:border-gray-400 max-w-screen-xl">
+      <div className="flex py-5 m-auto text-gray-700 dark:text-gray-300 text-sm flex-col items-center border-t border-gray-700 max-w-screen-xl">
         <div className="md:flex-auto md:flex-row-reverse mt-2 flex-row flex">
-          <a href="#" className="w-6 mx-1">
-            <PiWhatsappLogoLight className="text-xl text-black dark:text-white" />
-          </a>
-          <a href="#" className="w-6 mx-1">
-            <SlSocialInstagram className="text-lg text-black dark:text-white" />
-          </a>
-          <a href="#" className="w-6 mx-1">
-            <SlSocialTwitter className="text-lg text-black dark:text-white" />
-          </a>
-          <a href="#" className="w-6 mx-1">
-            <SlSocialYoutube className="text-xl text-black dark:text-white" />
-          </a>
+          <Link href="#" className="w-6 mx-1">
+            <PiWhatsappLogoLight className="text-xl text-gray-400" />
+          </Link>
+          <Link href="#" className="w-6 mx-1">
+            <SlSocialInstagram className="text-lg text-gray-400" />
+          </Link>
+          <Link href="#" className="w-6 mx-1">
+            <SlSocialTwitter className="text-lg text-gray-400" />
+          </Link>
+          <Link href="#" className="w-6 mx-1">
+            <SlSocialYoutube className="text-xl text-gray-400" />
+          </Link>
         </div>
         <div className="my-5">© Copyright 2025. All Rights Reserved.</div>
       </div>

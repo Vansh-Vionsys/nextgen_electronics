@@ -5,9 +5,9 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import useGetUserOrder from "@/features/orderMutations/useGetUserOrder";
 import Link from "next/link";
-import { TbShoppingCartExclamation } from "react-icons/tb";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, CircleUserRound, Truck } from "lucide-react";
+import { CircleUserRound, Truck } from "lucide-react";
+import { IOrder } from "@/types/order.types";
 
 const Orders = () => {
   const { data: session } = useSession();
@@ -41,13 +41,22 @@ const Orders = () => {
     );
   }
 
+  // Sort userOrders by createdAt in descending order (latest first)
+  const sortedOrders = userOrders
+    ? [...userOrders].sort((a: IOrder, b: IOrder) => {
+        const dateA = new Date(a.createdAt || "").getTime();
+        const dateB = new Date(b.createdAt || "").getTime();
+        return dateB - dateA; // Latest first
+      })
+    : [];
+
   return (
     <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
         My Orders
       </h1>
 
-      {!userOrders || userOrders.length === 0 ? (
+      {!sortedOrders || sortedOrders.length === 0 ? (
         <Card className="shadow-lg dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
           <CardContent className="p-6 text-center text-gray-500 dark:text-gray-400">
             No orders found. Start shopping now!
@@ -55,7 +64,7 @@ const Orders = () => {
         </Card>
       ) : (
         <div className="space-y-6">
-          {userOrders.map((order: any) => (
+          {sortedOrders.map((order: any) => (
             <Card
               key={order._id}
               className="shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden dark:bg-gray-900"
@@ -71,7 +80,7 @@ const Orders = () => {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <span className="sm:text-sm py-1 "> Payment status:</span>
+                    <span className="sm:text-sm py-1"> Payment status:</span>
                     <span
                       className={`px-3 py-1 rounded-full text-sm ${
                         order.paymentStatus === "completed"
@@ -81,16 +90,24 @@ const Orders = () => {
                     >
                       {order.paymentStatus}
                     </span>
-                    <span className="sm:text-sm py-1 "> Delivery status:</span>
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm  ${
-                        order.deliveryStatus === "shipped"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200"
-                          : "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200"
-                      }`}
-                    >
-                      {order.deliveryStatus}
-                    </span>
+                    {order.paymentStatus !== "pending" ? (
+                      <>
+                        <span className="sm:text-sm py-1">
+                          Delivery status:
+                        </span>
+                        <span
+                          className={`px-3 py-1 rounded-full text-sm ${
+                            order.deliveryStatus === "shipped"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200"
+                              : "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200"
+                          }`}
+                        >
+                          {order.deliveryStatus}
+                        </span>
+                      </>
+                    ) : (
+                      ""
+                    )}
                   </div>
                 </div>
               </CardHeader>

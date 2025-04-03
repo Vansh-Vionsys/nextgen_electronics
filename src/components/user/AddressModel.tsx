@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import toast from "react-hot-toast";
 
 export interface Address {
   name: string;
@@ -59,7 +60,7 @@ const AddressModel = ({
       !address.city ||
       !address.zipCode
     ) {
-      alert("Please fill in all address fields");
+      toast.error("Please fill in all address fields");
       return;
     }
     setShowAddressPopup(false);
@@ -87,11 +88,11 @@ const AddressModel = ({
               data.dbOrderId
             );
           } else {
-            alert("Failed to get Razorpay order details.");
+            toast.error("Failed to get Razorpay order details.");
           }
         },
         onError: () => {
-          alert("Failed to create order. Please try again.");
+          toast.error("Failed to create order. Please try again.");
         },
       }
     );

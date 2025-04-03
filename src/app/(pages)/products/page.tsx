@@ -28,12 +28,12 @@ const Product = ({ selectedCategory }: ProductProps) => {
   }
 
   return (
-    <div className="container mx-auto py-4 px-6 ">
+    <div className="py-4 px-6">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
         Products List
       </h1>
       <div className="flex justify-center items-center min-h-screen">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 max-w-7xl w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-7xl w-full">
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product: IProduct, index: number) => (
               <ProductCard key={product?.id || index} product={product} />
