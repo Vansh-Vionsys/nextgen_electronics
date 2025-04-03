@@ -25,10 +25,8 @@ export async function GET(req: NextRequest) {
       select: "name price stock images",
     })
     .lean();
-  if (!cart) {
-    return NextResponse.json({ message: "Cart is Empty" });
-  }
-  return NextResponse.json(Array.isArray(cart) ? cart : cart?.items);
+
+  return NextResponse.json(Array.isArray(cart) ? cart : cart?.items || []);
 }
 
 // POST: add products to cart

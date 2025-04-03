@@ -27,3 +27,10 @@ export interface Address {
 
 export type PaymentStatus = "pending" | "completed" | "failed";
 export type DeliveryStatus = "processing" | "shipped" | "delivered";
+
+export interface OrderResponse {
+  orderId: string;
+  amount: number;
+  currency: string;
+  dbOrderId: string;
+}

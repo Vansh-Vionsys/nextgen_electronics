@@ -35,4 +35,15 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-#################################################################################################################
+---
+
+Task to DO \_ Orders
+
+Admin -
+get ALl Orders with button to change delivery status
+
+"items with Quantities" "totalAmount" "paymentStatus" "address" "Order placed by userName" "deliveryStatus"
+
+user -
+get Orders by userID
+"items with Quantities" "totalAmount" "paymentStatus" "address" "deliveryStatus"

@@ -108,9 +108,7 @@ const SignInModal = () => {
 
         <div className="flex items-center justify-between">
           <span className="border-b w-1/2"></span>
-          <a href="#" className="text-xs text-center text-gray-500 uppercase">
-            or
-          </a>
+          <div className="text-xs text-center text-gray-500 uppercase">or</div>
           <span className="border-b w-1/2"></span>
         </div>
         <AuthButton />

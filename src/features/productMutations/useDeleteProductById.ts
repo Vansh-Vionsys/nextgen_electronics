@@ -9,18 +9,17 @@ const useDeleteProductById = () => {
     mutationFn: async (id: string) => deleteProductByIdAPI(id),
 
     onSuccess: () => {
-      toast.success("product deleted successfully");
+      toast.success("Product deleted successfully");
 
       queryClient.invalidateQueries({
         queryKey: ["products"],
         exact: true,
       });
     },
-    onError: (error: any) => {
-      toast.error("Error while deleting product", error);
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.error || "Failed to delete product");
     },
   });
-
   return {
     deleteProduct: mutate,
     isDeletingError: isError,

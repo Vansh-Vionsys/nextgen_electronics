@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import React from "react";
 import {
   FaPhone,
@@ -8,7 +9,7 @@ import {
 
 const Contact = () => {
   return (
-    <div className="bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-white min-h-screen py-12 transition-all duration-300">
+    <div className=" text-gray-900 dark:text-white min-h-screen py-12 transition-all duration-300">
       <h1 className="text-4xl font-bold text-center mb-12">Contact Us</h1>
 
       <section className="mb-32">
@@ -30,7 +31,7 @@ const Contact = () => {
         </div>
 
         <div className="container px-4 md:px-12 mt-[-100px]">
-          <div className="bg-gray-800 p-8 md:p-12 rounded-lg shadow-lg backdrop-blur-lg border border-gray-700">
+          <div className="bg-gray-900 rounded-lg shadow-md p-8 md:p-12 backdrop-blur-lg border border-gray-700">
             <div className="flex flex-col lg:flex-row gap-12">
               {/* Contact Form */}
               <div className="w-full lg:w-6/12">
@@ -69,13 +70,13 @@ const Contact = () => {
                       Send me a copy of this message
                     </label>
                   </div>
-                  <button
+                  <Button
                     type="submit"
-                    className="w-full bg-sky-500 text-white py-3 px-6 rounded-md hover:bg-sky-600 transition-colors flex items-center justify-center gap-2"
+                    className="w-full  bg-white text-black py-3 px-6 rounded-md transition-colors flex items-center justify-center gap-2"
                   >
                     <FaRegPaperPlane />
                     Send
-                  </button>
+                  </Button>
                 </form>
               </div>
 
@@ -83,7 +84,7 @@ const Contact = () => {
               <div className="w-full lg:w-6/12">
                 <div className="flex flex-col space-y-6">
                   <div className="flex items-center gap-4">
-                    <div className="text-sky-500 p-3 rounded-md bg-gray-700">
+                    <div className="text-white p-3 rounded-md bg-gray-700">
                       <FaEnvelope className="text-2xl" />
                     </div>
                     <div>
@@ -92,7 +93,7 @@ const Contact = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="text-sky-500 p-3 rounded-md bg-gray-700">
+                    <div className="text-white p-3 rounded-md bg-gray-700">
                       <FaPhone className="text-2xl" />
                     </div>
                     <div>
@@ -101,7 +102,7 @@ const Contact = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="text-sky-500 p-3 rounded-md bg-gray-700">
+                    <div className="text-white p-3 rounded-md bg-gray-700">
                       <FaMapMarkerAlt className="text-2xl" />
                     </div>
                     <div>

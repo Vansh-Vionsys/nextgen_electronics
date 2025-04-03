@@ -13,19 +13,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, CircleUserRound, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { TbShoppingCartExclamation } from "react-icons/tb";
 import Link from "next/link";
 import CartCheckout from "@/components/user/CartCheckout";
 import { toINR } from "@/helpers/convertToINR";
+import { useRouter } from "next/navigation";
 
 const Cart = () => {
+  const router = useRouter();
   const { data: session } = useSession();
   const userId = session?.user?.id || null;
   const { getAllCartProduct, getCartLoading } = useGetCartProduct(userId);
+  console.log("getAllCartProduct", getAllCartProduct);
+
   const { updateCartProduct } = useUpdateCartProduct();
   const { deleteCartProduct, deleteCartProductPending } = useDeleteCartProduct(
     userId || ""
@@ -33,6 +48,7 @@ const Cart = () => {
   const [cartQuantities, setCartQuantities] = useState<{
     [key: string]: number;
   }>({});
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
 
   useEffect(() => {
     if (getAllCartProduct) {
@@ -71,12 +87,29 @@ const Cart = () => {
   };
 
   const handleRemoveItem = (productId: string) => {
-    if (confirm("Are you sure you want to remove this item?")) {
-      deleteCartProduct(productId);
-    }
+    deleteCartProduct(productId);
+    setDeleteItemId(null);
   };
 
-  if (!getAllCartProduct || getAllCartProduct.length === 0) {
+  if (!session) {
+    return (
+      <div className="container mx-auto py-8 px-4 text-center flex flex-col items-center h-screen">
+        <p className="text-xl text-gray-700 dark:text-gray-200 font-medium pt-24">
+          Please sign in to view your cart
+        </p>
+        <CircleUserRound className="h-10 w-20 mt-4" />
+        <Button className="mt-4">
+          <Link href="/sign-in" className="flex items-center">
+            Go to Sign In
+          </Link>
+        </Button>
+      </div>
+    );
+  }
+
+  if (session?.user.role === "admin") return router.push("/admin/dashboard");
+
+  if (getAllCartProduct.length === 0) {
     return (
       <div className="container mx-auto py-8 px-4 text-center flex flex-col items-center h-screen">
         <p className="text-xl text-gray-700 dark:text-gray-200 font-medium pt-24">
@@ -84,10 +117,10 @@ const Cart = () => {
         </p>
         <TbShoppingCartExclamation className="h-10 w-20 mt-4" />
         <Button className="mt-4">
-          <a href="/products" className="flex items-center">
+          <Link href="/products" className="flex items-center">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
             Continue Shopping
-          </a>
+          </Link>
         </Button>
       </div>
     );
@@ -109,7 +142,7 @@ const Cart = () => {
               </div>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
-              {getAllCartProduct.map((item: any) => (
+              {getAllCartProduct?.map((item: any) => (
                 <div
                   key={item.product._id}
                   className="flex flex-col sm:flex-row items-start sm:items-center gap-6 py-6 border-b border-gray-200 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors rounded-lg p-4"
@@ -162,7 +195,7 @@ const Cart = () => {
                         </SelectTrigger>
                         <SelectContent className="max-h-60 overflow-y-auto bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
                           {Array.from(
-                            { length: Math.min(item.product.stock) },
+                            { length: Math.min(item.product.stock, 10) }, // Added max limit of 10
                             (_, i) => i + 1
                           ).map((qty) => (
                             <SelectItem
@@ -175,17 +208,46 @@ const Cart = () => {
                           ))}
                         </SelectContent>
                       </Select>
+                      <AlertDialog
+                        open={deleteItemId === item.product._id}
+                        onOpenChange={(open) =>
+                          setDeleteItemId(open ? item.product._id : null)
+                        }
+                      >
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors rounded-full p-2"
+                            disabled={deleteCartProductPending}
+                          >
+                            <Trash2 className="h-5 w-5" />
+                            <span className="sr-only">Remove</span>
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Remove Item</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to remove "
+                              {item.product.name}" from your cart?
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleRemoveItem(item.product._id)}
+                              className="bg-red-600 hover:bg-red-700"
+                              disabled={deleteCartProductPending}
+                            >
+                              {deleteCartProductPending
+                                ? "Removing..."
+                                : "Remove"}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors rounded-full p-2"
-                      onClick={() => handleRemoveItem(item.product._id)}
-                      disabled={deleteCartProductPending}
-                    >
-                      <Trash2 className="h-5 w-5" />
-                      <span className="sr-only">Remove</span>
-                    </Button>
                   </div>
                 </div>
               ))}
@@ -197,13 +259,10 @@ const Cart = () => {
             </CardContent>
           </Card>
         </div>
-        {/* Add CartCheckout Component Here */}
-        <div className="w-full lg:w-1/4">
-          <CartCheckout
-            cartItems={getAllCartProduct}
-            cartQuantities={cartQuantities}
-          />
-        </div>
+        <CartCheckout
+          cartItems={getAllCartProduct}
+          cartQuantities={cartQuantities}
+        />
       </div>
     </div>
   );

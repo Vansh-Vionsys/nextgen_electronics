@@ -223,8 +223,13 @@ const ProductDetails = () => {
                   className="w-full sm:w-48 rounded-full py-2 "
                   disabled={isAddingCart}
                 >
-                  <ShoppingCart className="mr-2 h-5 w-5" />
-                  {isAddingCart ? <Spinner /> : "Add to Cart"}
+                  {isAddingCart ? (
+                    <Spinner />
+                  ) : (
+                    <>
+                      <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
+                    </>
+                  )}
                 </Button>
                 <Button
                   onClick={handleAddReview}

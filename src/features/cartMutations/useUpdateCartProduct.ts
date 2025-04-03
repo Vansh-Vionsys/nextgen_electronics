@@ -17,10 +17,13 @@ const useUpdateCartProduct = () => {
     }) => updateCartProductApi({ userId, productId, quantity }),
 
     onSuccess: ({ userId }) => {
-      toast.success("Cart Item Updated Successfully");
+      toast.success("Cart item updated successfully");
       queryClient.invalidateQueries({
         queryKey: ["cart", userId],
       });
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.error || "Failed to update cart item");
     },
   });
 

@@ -2,10 +2,10 @@ import React from "react";
 
 const Spinner = () => {
   return (
-    <div className="relative w-5 h-5 rounded-full animate-spin">
-      <div className="absolute top-0 left-0 w-full h-full border-t-4 border-blue-500 rounded-full"></div>
-      <div className="absolute top-0 left-0 w-full h-full border-r-4 border-green-500 rounded-full"></div>
-      <div className="absolute top-0 left-0 w-full h-full border-b-4 border-yellow-500 rounded-full"></div>
+    <div className="flex space-x-2 justify-center items-center">
+      <div className="h-2 w-2 bg-white dark:bg-black rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+      <div className="h-2 w-2 bg-white dark:bg-black rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+      <div className="h-2 w-2 bg-white dark:bg-black rounded-full animate-bounce"></div>
     </div>
   );
 };

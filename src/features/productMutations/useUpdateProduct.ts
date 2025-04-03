@@ -10,10 +10,13 @@ const useUpdateProduct = () => {
       updateProductApi({ id, data }),
 
     onSuccess: () => {
-      toast.success("Product updated successfully.");
+      toast.success("Product updated successfully");
       queryClient.invalidateQueries({
         queryKey: ["products"],
       });
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.error || "Failed to update product");
     },
   });
 

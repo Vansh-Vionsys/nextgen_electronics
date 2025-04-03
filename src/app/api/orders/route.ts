@@ -1,14 +1,15 @@
 import { authOptions } from "@/lib/auth";
-import dbConnect from "@/lib/dbConnect"; // Assuming you renamed it to match your first code
-import { razorInstance } from "@/lib/razorInstance"; // Use the same Razorpay instance as in the reference
+import dbConnect from "@/lib/dbConnect";
+import { razorInstance } from "@/lib/razorInstance";
+import Cart from "@/models/cart.model";
 import Order from "@/models/order.model";
-import Voucher from "@/models/voucher.model"; // If you need voucher functionality
+import Product from "@/models/product.model";
+import Voucher from "@/models/voucher.model";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    // Check for authenticated user
     const session = await getServerSession(authOptions);
     if (!session) {
       return NextResponse.json(
@@ -17,16 +18,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Parse request body
-    const {
-      items,
-      address,
-      totalAmount,
-      voucherAmount = 0,
-      voucherId,
-    } = await req.json();
+    const { items, address, totalAmount, voucherId } = await req.json();
 
-    // Validate required fields
     if (!items || items.length === 0) {
       return NextResponse.json(
         { error: "Items are required" },
@@ -46,21 +39,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Connect to the database
     await dbConnect();
-
-    // Adjust total amount if voucher is applied
-    const adjustedAmount = totalAmount - (voucherAmount || 0);
-    if (adjustedAmount <= 0) {
-      return NextResponse.json(
-        { error: "Invalid amount after voucher" },
-        { status: 400 }
-      );
-    }
 
     // Create Razorpay order
     const razorpayOrder = await razorInstance.orders.create({
-      amount: Math.round(adjustedAmount * 100), // Convert to paise
+      amount: Math.round(totalAmount * 100), // Convert to paise
       currency: "INR",
       receipt: `receipt-${Date.now()}`,
       notes: {
@@ -70,9 +53,9 @@ export async function POST(req: NextRequest) {
 
     // Create new order in the database
     const newOrder = await Order.create({
-      user: session.user.id, // Use 'user' instead of 'userId' as per your schema
+      user: session.user.id,
       items: items.map((item: any) => ({
-        product: item.product, // Ensure this is a valid ObjectId
+        product: item.product,
         quantity: item.quantity,
       })),
       address: {
@@ -82,21 +65,27 @@ export async function POST(req: NextRequest) {
         city: address.city,
         zipCode: address.zipCode,
       },
-      totalAmount: adjustedAmount, // Store the adjusted amount
+      totalAmount: totalAmount,
       razorpayOrderId: razorpayOrder.id,
-      paymentStatus: "pending", // Default as per schema
-      deliveryStatus: "processing", // Default as per schema
+      paymentStatus: "pending",
+      deliveryStatus: "processing",
     });
 
-    // If a voucher is applied, update voucher count
-    if (voucherAmount > 0 && voucherId) {
+    if (voucherId) {
       await Voucher.findOneAndUpdate(
         { _id: voucherId },
-        { $inc: { voucherNumber: -1 } }
+        { $inc: { voucherCount: -1 } }
+      );
+    }
+    for (const item of items) {
+      await Product.findOneAndUpdate(
+        { _id: item.product },
+        { $inc: { stock: -item.quantity } }
       );
     }
 
-    // Return response with necessary details
+    await Cart.updateOne({ user: session.user.id }, { $set: { items: [] } });
+
     return NextResponse.json({
       orderId: razorpayOrder.id,
       amount: razorpayOrder.amount,

@@ -24,6 +24,7 @@ import { Upload, X } from "lucide-react";
 import { Product } from "@/types/product.types";
 import useUpdateProduct from "@/features/productMutations/useUpdateProduct";
 import Spinner from "../Spinner";
+import Image from "next/image";
 
 const categories = [
   "Mobile & Accessories",
@@ -232,7 +233,9 @@ const EditProduct = ({ product }: { product: Product }) => {
                 {imagePreviews.map((img, index) => (
                   <div key={index} className="relative group">
                     <AspectRatio ratio={1 / 1}>
-                      <img
+                      <Image
+                        width={120}
+                        height={120}
                         src={img}
                         alt={`Preview ${index}`}
                         className="w-full h-full object-cover rounded-lg"

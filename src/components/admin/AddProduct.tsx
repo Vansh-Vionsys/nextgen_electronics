@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import Spinner from "../Spinner";
+import Image from "next/image";
 
 interface ImageData {
   file: File;
@@ -253,7 +254,9 @@ const AddProduct = () => {
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       {imageInputs.map((image, index) => (
                         <div key={index} className="relative group">
-                          <img
+                          <Image
+                            width={120}
+                            height={120}
                             src={image.preview}
                             alt={`Preview ${index + 1}`}
                             className="w-full h-32 object-cover rounded-lg"

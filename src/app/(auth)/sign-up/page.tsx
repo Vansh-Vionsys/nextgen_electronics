@@ -127,9 +127,9 @@ const SignUp = () => {
           </Form>
           <div className="flex items-center justify-between">
             <span className="border-b w-1/2"></span>
-            <a href="#" className="text-xs text-center text-gray-500 uppercase">
+            <div className="text-xs text-center text-gray-500 uppercase">
               or
-            </a>
+            </div>
             <span className="border-b w-1/2"></span>
           </div>
           <AuthButton />
