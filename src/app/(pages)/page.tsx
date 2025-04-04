@@ -6,7 +6,6 @@ import { Spotlight } from "@/components/ui/spotlight";
 import { Modal } from "@/components/ui/modal";
 import { Bot, ChevronDown } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { CategoryFilter } from "@/components/category-filter";
 import Products from "./products/page";
 import AIModel from "@/components/user/AIModel";

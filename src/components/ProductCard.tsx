@@ -29,6 +29,7 @@ import {
 } from "./ui/select";
 import Spinner from "./Spinner";
 import { toINR } from "@/helpers/convertToINR";
+import { useRouter } from "next/navigation";
 
 const ProductCard = ({ product }: { product: any }) => {
   const { data: session } = useSession();
@@ -38,10 +39,15 @@ const ProductCard = ({ product }: { product: any }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { addCartProduct, isAddingCart } = useAddCartProduct(userId || "");
   const { deleteProduct, isDeletePending } = useDeleteProductById();
+  const router = useRouter();
 
   const handleSubmit = (productId: string) => {
-    const data = { productId, quantity };
-    addCartProduct(data);
+    if (!session?.user) {
+      router.push("/sign-in");
+    } else {
+      const data = { productId, quantity };
+      addCartProduct(data);
+    }
   };
 
   const handleDeleteConfirm = () => {
@@ -57,25 +63,39 @@ const ProductCard = ({ product }: { product: any }) => {
   };
 
   const renderStars = (rating: number) => {
-    const stars = [];
-    const maxStars = 5;
-    for (let i = 1; i <= maxStars; i++) {
-      stars.push(
-        <svg
-          key={i}
-          className={`w-4 h-4 ${
-            i <= Math.floor(rating)
-              ? "fill-yellow-400"
-              : "fill-gray-300 dark:fill-gray-600"
-          }`}
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-        >
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-        </svg>
-      );
-    }
-    return stars;
+    return (
+      <div className="flex items-center gap-1">
+        {[...Array(5)].map((_, i) => {
+          const starPercentage = Math.min(Math.max((rating - i) * 100, 0), 100);
+
+          return (
+            <div key={i} className="relative h-4 w-4">
+              {/* Empty Star */}
+              <svg
+                className="h-4 w-4 text-gray-300 dark:text-gray-600 absolute"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+              {/* Filled Star with clip-path */}
+              <div
+                className="absolute inset-0 overflow-hidden"
+                style={{ clipPath: `inset(0 ${100 - starPercentage}% 0 0)` }}
+              >
+                <svg
+                  className="h-4 w-4 text-yellow-400 fill-current"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
   };
 
   return (

@@ -16,16 +16,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Spinner from "@/components/Spinner";
-import { ShoppingCart, Star, MessageSquare } from "lucide-react";
+import { ShoppingCart, Star } from "lucide-react";
 import Image from "next/image";
 import { toINR } from "@/helpers/convertToINR";
-
+import { useRouter } from "next/navigation";
 const ProductDetails = () => {
   const { id } = useParams();
   const productId = id as string;
   const { data: session } = useSession();
   const userId = session?.user?.id;
-
+  const router = useRouter();
   const { getProductDetail, getProductDetailsLoading } =
     useGetProductById(productId);
   const [quantity, setQuantity] = useState(1);
@@ -40,13 +40,12 @@ const ProductDetails = () => {
   };
 
   const handleSubmit = (productId: string) => {
-    const data = { productId, quantity };
-    addCartProduct(data);
-  };
-
-  const handleAddReview = () => {
-    // Placeholder for review functionality (e.g., open a modal or redirect)
-    alert("Add Review functionality coming soon!");
+    if (!session?.user) {
+      router.push("/sign-in");
+    } else {
+      const data = { productId, quantity };
+      addCartProduct(data);
+    }
   };
 
   useEffect(() => {
@@ -138,31 +137,43 @@ const ProductDetails = () => {
             </CardHeader>
             <CardContent className="p-6 space-y-6">
               {/* Rating */}
+              // Replace the Rating section in your CardContent with this:
               <div className="flex items-center gap-2">
                 <span className="text-yellow-400 flex">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-5 w-5 ${
-                        i < Math.round(getProductDetail.ratings)
-                          ? "fill-current"
-                          : "text-gray-300 dark:text-gray-600"
-                      }`}
-                    />
-                  ))}
+                  {[...Array(5)].map((_, i) => {
+                    const ratingValue = getProductDetail.ratings;
+                    const starPercentage = Math.min(
+                      Math.max((ratingValue - i) * 100, 0),
+                      100
+                    );
+
+                    return (
+                      <div key={i} className="relative h-5 w-5">
+                        {/* Empty Star */}
+                        <Star className="h-5 w-5 text-gray-300 dark:text-gray-600 absolute" />
+                        {/* Filled Star with clip-path */}
+                        <div
+                          className="absolute inset-0 overflow-hidden"
+                          style={{
+                            clipPath: `inset(0 ${100 - starPercentage}% 0 0)`,
+                          }}
+                        >
+                          <Star className="h-5 w-5 text-yellow-400 fill-current" />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </span>
                 <span className="text-sm text-gray-500 dark:text-gray-400">
                   ({getProductDetail.ratings} / 5)
                 </span>
               </div>
-
               {/* Price */}
               <div>
                 <span className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {toINR(getProductDetail.price)}
                 </span>
               </div>
-
               {/* Availability */}
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-gray-700 dark:text-gray-300">
@@ -181,12 +192,10 @@ const ProductDetails = () => {
                     : `${getProductDetail.stock} left only`}
                 </Badge>
               </div>
-
               {/* Description */}
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                 {getProductDetail.description}
               </p>
-
               {/* Quantity Selector */}
               <div className="flex items-center gap-4">
                 <span className="font-semibold text-gray-700 dark:text-gray-300">
@@ -215,7 +224,6 @@ const ProductDetails = () => {
                   </SelectContent>
                 </Select>
               </div>
-
               {/* Buttons */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
@@ -230,14 +238,6 @@ const ProductDetails = () => {
                       <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
                     </>
                   )}
-                </Button>
-                <Button
-                  onClick={handleAddReview}
-                  variant="outline"
-                  className="w-full sm:w-48 border-primary text-primary hover:bg-primary hover:text-white font-semibold rounded-full py-2 transition-colors dark:border-indigo-400 dark:text-indigo-400 dark:hover:bg-indigo-400 dark:hover:text-white"
-                >
-                  <MessageSquare className="mr-2 h-5 w-5" />
-                  Add Review
                 </Button>
               </div>
             </CardContent>

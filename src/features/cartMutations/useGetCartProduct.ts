@@ -5,6 +5,7 @@ const useGetCartProduct = (userId: string | null) => {
   const { data, error, isLoading } = useQuery({
     queryKey: ["cart", userId],
     queryFn: () => getAllCartProductApi(userId as string),
+    enabled: !!userId,
   });
   return {
     getAllCartProduct: data,

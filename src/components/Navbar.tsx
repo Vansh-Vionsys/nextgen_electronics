@@ -27,7 +27,7 @@ const Navbar = () => {
   const isLogin = !!session?.user;
   const isAdmin = session?.user?.role === "admin";
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { getAllCartProduct } = useGetCartProduct(userId || "");
+  const { getAllCartProduct } = useGetCartProduct(userId || null);
   const cartCount = getAllCartProduct?.length || 0;
   const { logout } = useLogout();
 

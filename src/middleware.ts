@@ -15,38 +15,36 @@ export default withAuth(
           return true;
         }
 
-        // Allow authentication-related routes
-        const authRoutes = ["/api/auth", "/sign-in", "/sign-up"];
-        if (authRoutes.some((route) => pathname.startsWith(route))) {
-          return true;
-        }
-
-        // Define public routes
-        const publicRoutes = [
-          "/",
-          "/about",
-          "/contact",
-          "/search",
-          "/cart",
-          "/orders",
-          "/products",
-        ];
+        // Allow auth-related routes
         if (
-          publicRoutes.some(
-            (route) => pathname === route || pathname.startsWith(route)
-          ) ||
-          pathname.startsWith("/api/products")
+          pathname.startsWith("/api/auth") ||
+          pathname === "/sign-in" ||
+          pathname === "/sign-up"
         ) {
           return true;
         }
 
-        // Restrict admin routes to admin users only
+        // Public routes
+        if (
+          pathname === "/" ||
+          pathname.startsWith("/api/products") ||
+          pathname.startsWith("/products") ||
+          pathname.startsWith("/search") ||
+          pathname.startsWith("/about") ||
+          pathname.startsWith("/contact") ||
+          pathname.startsWith("/cart") ||
+          pathname.startsWith("/orders")
+        ) {
+          return true;
+        }
+
+        // Admin routes require admin role
         if (pathname.startsWith("/admin")) {
           return token?.role === "admin";
         }
 
-        // Require authentication for all other routes
-        return Boolean(token);
+        // All other routes require authentication
+        return !!token;
       },
     },
   }
