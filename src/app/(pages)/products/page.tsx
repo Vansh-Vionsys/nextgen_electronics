@@ -3,11 +3,14 @@ import ProductCard from "@/components/ProductCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import useGetAllProducts from "@/features/productMutations/useGetAllProducts";
 import { IProduct } from "@/types/product.types";
+import React from "react";
 
 interface ProductProps {
   selectedCategory: string | null;
+  limit?: number; // Add optional limit prop
 }
-const Product = ({ selectedCategory }: ProductProps) => {
+
+const Product = ({ selectedCategory, limit }: ProductProps) => {
   const { getAllProducts, getAllProductsLoading } = useGetAllProducts();
 
   // Filter products based on selected category
@@ -16,6 +19,10 @@ const Product = ({ selectedCategory }: ProductProps) => {
         (product: IProduct) => product.category === selectedCategory
       ) || []
     : getAllProducts || []; // Show all products if no category is selected
+
+  // Apply limit if provided
+  const displayedProducts =
+    limit !== undefined ? filteredProducts.slice(0, limit) : filteredProducts;
 
   if (getAllProductsLoading) {
     return (
@@ -34,8 +41,8 @@ const Product = ({ selectedCategory }: ProductProps) => {
       </h1>
       <div className="flex justify-center items-center min-h-screen">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-7xl w-full">
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((product: IProduct, index: number) => (
+          {displayedProducts.length > 0 ? (
+            displayedProducts.map((product: IProduct, index: number) => (
               <ProductCard key={product?.id || index} product={product} />
             ))
           ) : (

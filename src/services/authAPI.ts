@@ -13,3 +13,8 @@ export const registerApi = async ({
   });
   return response.data;
 };
+
+export const getUsersApi = async () => {
+  const response = await axios.get("/api/auth");
+  return response.data;
+};

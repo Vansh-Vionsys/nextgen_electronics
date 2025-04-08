@@ -29,7 +29,7 @@ const AllOrders = () => {
     return (
       <div className="container mx-auto py-8 px-4 text-center flex flex-col items-center h-screen">
         <Truck className="h-10 w-20 mt-4" />
-        <span className="flex items-center">Loading your orders...</span>
+        <span className="flex items-center">Loading orders...</span>
       </div>
     );
   }

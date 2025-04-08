@@ -17,6 +17,7 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
   const [AIModal, setAIModal] = useState<boolean>(false);
+  const [showAllProducts, setShowAllProducts] = useState(false); // State to toggle products
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,7 +33,7 @@ const Home = () => {
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
       <Card className="w-full h-[500px] bg-black/[0.96] relative overflow-hidden">
-        {/*   <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" />  */}
+        <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" />
         <div className="flex h-full relative">
           {/* Left content */}
           <div className="flex-1 p-8 z-10 flex flex-col justify-center">
@@ -61,10 +62,10 @@ const Home = () => {
 
           {/* Right content */}
           <div className="flex-1 relative">
-            {/* <SplineScene
+            <SplineScene
               scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
               className="w-full h-full"
-            /> */}
+            />
           </div>
           <div className="absolute bottom-8 left-0 right-0 text-center z-20">
             <button
@@ -90,7 +91,22 @@ const Home = () => {
             setSelectedCategory(category);
           }}
         />
-        <Products selectedCategory={selectedCategory} />
+        {/* Pass limit prop to Products component */}
+        <Products
+          selectedCategory={selectedCategory}
+          limit={showAllProducts ? undefined : 4} // Show 3 products (1 row) by default
+        />
+        {/* Show More Button */}
+        {!showAllProducts && (
+          <div className="text-center">
+            <button
+              onClick={() => setShowAllProducts(true)}
+              className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full hover:scale-105 transition-transform duration-300"
+            >
+              View More
+            </button>
+          </div>
+        )}
       </div>
 
       {/* AI Assistant Modal */}

@@ -12,13 +12,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ModeToggle } from "./ui/ModeToggle/ModeToggle";
 import { useLogout } from "@/features/authMutations/useLogin";
 import useGetCartProduct from "@/features/cartMutations/useGetCartProduct";
 import { Badge } from "@/components/ui/badge";
 import { Menu, X } from "lucide-react";
 import { CiSearch } from "react-icons/ci";
+import Image from "next/image";
 
 const Navbar = () => {
   const { data: session } = useSession();
@@ -103,20 +103,21 @@ const Navbar = () => {
             {isLogin ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="relative h-8 w-8 rounded-full"
-                  >
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage
-                        src={session.user.image || ""}
-                        alt={session.user.name || ""}
-                      />
-                      <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                        {session.user.name?.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
+                  <div className="relative h-8 w-8 rounded-full cursor-pointer">
+                    <div className="h-8 w-8 rounded-full overflow-hidden bg-gray-700 flex items-center justify-center text-white text-sm font-medium text-primary">
+                      {session.user.image ? (
+                        <Image
+                          width={32}
+                          height={32}
+                          src={session.user.image}
+                          alt={session.user.name || "user"}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        session.user.name?.charAt(0).toUpperCase()
+                      )}
+                    </div>
+                  </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end">
                   <DropdownMenuLabel>

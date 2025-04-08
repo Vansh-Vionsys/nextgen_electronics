@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Spinner from "@/components/Spinner";
+import { Eye, EyeOff } from "lucide-react";
 
 // Define the form schema using Zod
 const formSchema = z.object({
@@ -108,7 +109,11 @@ const SignUp = () => {
                           onClick={() => setShowPassword(!showPassword)}
                           className="absolute inset-y-0 right-3 flex items-center text-gray-500 dark:text-gray-300"
                         >
-                          {showPassword ? "👁️" : "🙈"}
+                          {showPassword ? (
+                            <Eye size={20} />
+                          ) : (
+                            <EyeOff size={20} />
+                          )}
                         </button>
                       </div>
                     </FormControl>
@@ -149,28 +154,3 @@ const SignUp = () => {
 };
 
 export default SignUp;
-
-//===================================
-
-// "use client";
-// import { signIn, signOut, useSession } from "next-auth/react";
-// import React from "react";
-
-// const SignUp = () => {
-//   const { data: session, status } = useSession();
-//   console.log("session:", session, status);
-//   return (
-//     <div>
-//       {session ? (
-//         <>
-//           <p>Welcome, {session.user?.name}</p>
-//           <button onClick={() => signOut()}>Sign Out</button>
-//         </>
-//       ) : (
-//         <button onClick={() => signIn("google")}>Sign In with Google</button>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default SignUp;

@@ -38,6 +38,14 @@ const Footer = () => {
                 Contact
               </Link>
             </li>
+            <li className="my-2">
+              <Link
+                className="text-gray-700 dark:text-gray-300 hover:underline"
+                href="/about"
+              >
+                About
+              </Link>
+            </li>
           </ul>
         </div>
         <div className="p-5 sm:w-7/12 border-r border-gray-700 text-center">

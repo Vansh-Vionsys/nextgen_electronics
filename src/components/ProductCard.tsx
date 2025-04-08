@@ -106,7 +106,7 @@ const ProductCard = ({ product }: { product: any }) => {
           height={300}
           src={product.images[0]?.url || "/placeholder-image.jpg"} // Added fallback
           alt={product.name}
-          className="w-full h-full object-cover" // Added object-cover for better image display
+          className="w-full h-full" // Added object-cover for better image display
         />
       </div>
 

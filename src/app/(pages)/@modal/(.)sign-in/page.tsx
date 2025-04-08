@@ -25,6 +25,7 @@ import Link from "next/link";
 import AuthButton from "@/components/AuthButton";
 import { useLogin } from "@/features/authMutations/useLogin";
 import Spinner from "@/components/Spinner";
+import { Eye, EyeOff } from "lucide-react";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -92,7 +93,11 @@ const SignInModal = () => {
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute inset-y-0 right-3 flex items-center text-gray-500 dark:text-gray-300"
                       >
-                        {showPassword ? "👁️" : "🙈"}
+                        {showPassword ? (
+                          <Eye size={20} />
+                        ) : (
+                          <EyeOff size={20} />
+                        )}
                       </button>
                     </div>
                   </FormControl>
